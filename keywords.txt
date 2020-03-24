@@ -1,0 +1,64 @@
+#######################################
+# Syntax DFRobot_ID809
+#######################################
+
+#######################################
+# Datatypes (KEYWORD1)
+#######################################
+
+DFRobot_ID809	KEYWORD1
+
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
+
+begin	KEYWORD2
+testConnection	KEYWORD2
+setDeviceID	KEYWORD2
+setSecurityLevel	KEYWORD2
+setDuplicationCheck	KEYWORD2
+setBaudrate	KEYWORD2
+setAutoLearn	KEYWORD2
+readDeviceID	KEYWORD2
+readSecurityLevel	KEYWORD2
+readDuplicationCheck	KEYWORD2
+readBaudrate	KEYWORD2
+readAutoLearn	KEYWORD2
+getDeviceInfo	KEYWORD2
+LEDCtrl	KEYWORD2
+detectFinger	KEYWORD2
+getEmptyID	KEYWORD2
+getStatusID	KEYWORD2
+getEnrollCount	KEYWORD2
+setCollectNumber	KEYWORD2
+generate	KEYWORD2
+storeChar	KEYWORD2
+delChar	KEYWORD2
+search	KEYWORD2
+verify	KEYWORD2
+enterStandbyState	KEYWORD2
+
+#######################################
+# Constants (LITERAL1)
+#######################################
+
+eLEDMode1	LITERAL1
+eLEDMode2	LITERAL1
+eLEDMode3	LITERAL1
+eLEDMode4	LITERAL1
+eLEDMode5	LITERAL1
+LEDGreen	LITERAL1
+LEDRed	LITERAL1
+LEDYellow	LITERAL1
+LEDBlue	LITERAL1
+LEDCyan	LITERAL1
+LEDMagenta	LITERAL1
+LEDWhite	LITERAL1
+e9600bps	LITERAL1
+e19200bps	LITERAL1
+e38400bps	LITERAL1
+e57600bps	LITERAL1
+e115200bps	LITERAL1
+e230400bps	LITERAL1
+e460800bps	LITERAL1
+e921600bps	LITERAL1
