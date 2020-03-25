@@ -9,7 +9,7 @@
  * @version  V1.0
  * @date  2020-03-19
  * @get from https://www.dfrobot.com
- * @url https://github.com/DFRobot/DFRobot_IIC_Serial
+ * @url https://github.com/cdjq/DFRobot_ID809
  */
 
 #ifndef _DFRobot_ID809_H
@@ -23,8 +23,6 @@
 #include <Wire.h>
 
 #include <stdint.h>
-#include <HardwareSerial.h>
-#include <SoftwareSerial.h>
 
 //Open this macro to see the detailed running process of the program 
 #define ENABLE_DBG 0
@@ -67,6 +65,10 @@ typedef struct{
 class DFRobot_ID809{
 public: 
 
+#define FINGERPRINTCAPACITY      80      //模块指纹容量
+#define MODULESNSIZE             16      //模块SN大小
+
+
 #define DELALL                   0xFF    //删除所有指纹
 
 #define CMD_PREFIX_CODE          0xAA55  //命令包前缀代码
@@ -74,9 +76,9 @@ public:
 #define CMD_DATA_PREFIX_CODE     0xA55A  //命令数据包前缀代码
 #define RCM_DATA_PREFIX_CODE     0x5AA5  //响应数据包前缀代码
 
-#define CMDTYPE                   0xF0    //命令包类型
-#define RCMTYPE                   0xF0    //响应包类型
-#define DATATYPE                  0x0F    //数据包类型
+#define CMDTYPE                  0xF0    //命令包类型
+#define RCMTYPE                  0xF0    //响应包类型
+#define DATATYPE                 0x0F    //数据包类型
 
 #define CMD_TEST_CONNECTION      0X0001  //连接测试
 #define CMD_SET_PARAM            0X0002  //设置参数
@@ -87,13 +89,13 @@ public:
 #define CMD_ENTER_STANDBY_STATE  0X000C  //进入休眠状态
 #define CMD_GET_IMAGE            0X0020  //采集指纹图像
 #define CMD_FINGER_DETECT        0X0021  //检测手指
-	#define CMD_UP_IMAGE_CODE        0X0022  //上传指纹图像到主机
-	#define CMD_DOWN_IMAGE           0X0023  //下载指纹图像到模块
+    #define CMD_UP_IMAGE_CODE        0X0022  //上传指纹图像到主机
+    #define CMD_DOWN_IMAGE           0X0023  //下载指纹图像到模块
 #define CMD_SLED_CTRL            0X0024  //控制采集器背光灯
 #define CMD_STORE_CHAR           0X0040  //保存指纹模板数据到模块指纹库
 #define CMD_LOAD_CHAR            0X0041  //读取模块中的指纹并暂存在 RAMBUFFER 中
-	#define CMD_UP_CHAR              0X0042  //将暂存在 RAMBUFFER 中的指纹模板上传到主机
-	#define CMD_DOWN_CHAR            0X0043  //下载指纹模板数据到模块指定的 RAMBUFFER
+    #define CMD_UP_CHAR              0X0042  //将暂存在 RAMBUFFER 中的指纹模板上传到主机
+    #define CMD_DOWN_CHAR            0X0043  //下载指纹模板数据到模块指定的 RAMBUFFER
 #define CMD_DEL_CHAR             0X0044  //删除指定编号范围内的指纹
 #define CMD_GET_EMPTY_ID         0X0045  //获取指定编号范围内可注册的首个编号
 #define CMD_GET_STATUS           0X0046  //检查指定的编号是否已被注册
@@ -133,7 +135,6 @@ public:
 #define ERR_TIME_OUT             0x44    //采集超时
 #define ERR_GATHER_OUT           0x45    //模板采集次数超过上限
 #define ERR_RECV_TIMEOUT         0x46    //通讯超时
-
 #define ERR_ID809                0xFF    //出现错误
 
 
@@ -147,7 +148,7 @@ public:
     eFadeIn,         //渐开
     eFadeOut,        //渐关
     eSlowBlink       //慢闪
-  }eLED_MODE_t;
+  }eLEDMode_t;
   
   typedef enum{
     eLEDGreen = 1,   //绿色
@@ -157,7 +158,7 @@ public:
     eLEDCyan,        //青色
     eLEDMagenta,     //品红色
     eLEDWhite        //白色
-  }eLED_COLOR_t;
+  }eLEDColor_t;
    
   typedef enum{
     e9600bps = 1,
@@ -168,7 +169,7 @@ public:
     e230400bps,
     e460800bps,
     e921600bps
-  }eDEVICE_BAUDRATE_t;
+  }eDeviceBaudrate_t;
   
   typedef enum{
     eErrorSuccess            = 0x00,    //指令处理成功
@@ -213,44 +214,44 @@ public:
   
   /**
    * @brief 测试模块是否正常连接
-   * @return 0(succeed) or ERR_ID809
+   * @return true or false
    */
-  uint8_t isConnected();
+  bool isConnected();
   
   /**
    * @brief 设置模块ID
    * @param ID号:1-255
    * @return 0(succeed) or ERR_ID809
    */
-  uint8_t setDeviceID(uint8_t DeviceID);
+  uint8_t setDeviceID(uint8_t deviceID);
   
   /**
    * @brief 设置模块安全等级
    * @param 安全等级:1-5
    * @return 0(succeed) or ERR_ID809
    */
-  uint8_t setSecurityLevel(uint8_t SecurityLevel);
+  uint8_t setSecurityLevel(uint8_t securityLevel);
   
   /**
    * @brief 设置模块指纹重复检查(在保存指纹时，检查是否已被注册)
    * @param 1(ON) or 0(OFF)
    * @return 0(succeed) or ERR_ID809
    */
-  uint8_t setDuplicationCheck(uint8_t DuplicationCheck);
+  uint8_t setDuplicationCheck(uint8_t duplicationCheck);
   
   /**
    * @brief 设置模块波特率
    * @param Baudrate:in typedef enum eDEVICE_BAUDRATE_t
    * @return 0(succeed) or ERR_ID809
    */
-  uint8_t setBaudrate(eDEVICE_BAUDRATE_t Baudrate);
+  uint8_t setBaudrate(eDeviceBaudrate_t baudrate);
   
   /**
    * @brief 设置模块自学功能(在对比指纹成功时，更新指纹)
    * @param 1(ON) or 0(OFF)
    * @return 0(succeed) or ERR_ID809
    */
-  uint8_t setAutoLearn(uint8_t AutoLearn);
+  uint8_t setAutoLearn(uint8_t autoLearn);
   
   /**
    * @brief 读取模块ID
@@ -307,7 +308,7 @@ public:
    * @param 闪烁次数
    * @return 0(succeed) or ERR_ID809
    */
-  uint8_t LEDCtrl(eLED_MODE_t mode,eLED_COLOR_t color,uint8_t blinkCount);
+  uint8_t ctrlLED(eLEDMode_t mode,eLEDColor_t color,uint8_t blinkCount);
   
   /**
    * @brief 检测是否有手指触碰
@@ -343,7 +344,7 @@ public:
    * @brief 采集指纹
    * @return 0(succeed) or ERR_ID809
    */
-  uint8_t fingerprintCollection(uint16_t timeout);
+  uint8_t collectionFingerprint(uint16_t timeout);
   
   /**
    * @brief 保存指纹
@@ -394,10 +395,10 @@ public:
   /**
    * @brief 取出指纹模板，暂存到RamBuffer中
    * @param 指纹ID号
-   * @param RamBuffer号
+   * @param RamBuffer号 0-2
    * @return 0(succeed) or ERR_ID809
    */
-  uint8_t loadChar(uint8_t ID, uint8_t RamBufferID);
+  uint8_t loadFingerprint(uint8_t ID, uint8_t RamBufferID);
   
   /**
    * @brief 进入休眠状态
@@ -405,6 +406,10 @@ public:
    */
   uint8_t enterStandbyState();
   
+  /**
+   * @brief 获取错误信息
+   * @return 错误信息的文本描述
+   */
   String getErrorDescription();
   
   bool setDbgSerial(Stream &s_){dbg = &s_; return true;}
@@ -412,33 +417,33 @@ protected:
    /**
    * @brief 设置参数
    * @param 数据类型+数据
-   * @return 0(succeed) or Error Code
+   * @return 0(succeed) or ERR_ID809
    */
   uint8_t setParam(uint8_t* data);
   
    /**
    * @brief 读取参数
    * @param 数据类型
-   * @return 数据 or Error Code
+   * @return 数据 or ERR_ID809
    */
   uint8_t getParam(uint8_t* data);
   
   /**
    * @brief 采集指纹图像
-   * @return 0(succeed) or Error Code
+   * @return 0(succeed) or ERR_ID809
    */
   uint8_t getImage();
    
    /**
    * @brief 将图像生成模板
    * @param Ram Buffer 编号
-   * @return 0(succeed) or Error Code
+   * @return 0(succeed) or ERR_ID809
    */
   uint8_t generate(uint8_t RamBufferID);
   
  /**
    * @brief 合成指纹
-   * @return 0(succeed) or Error Code
+   * @return 0(succeed) or ERR_ID809
    */
   uint8_t merge();
   

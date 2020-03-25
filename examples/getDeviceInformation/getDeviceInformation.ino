@@ -8,22 +8,22 @@
  * @version  V1.0
  * @date  2020-03-19
  * @get from https://www.dfrobot.com
- * @url https://github.com/DFRobot/DFRobot_SHT3x
+ * @url https://github.com/cdjq/DFRobot_ID809
 */
 
 #include <DFRobot_ID809.h>
 
 /*如果使用UNO或NANO，则使用软串口*/
 #if ((defined ARDUINO_AVR_UNO) || (defined ARDUINO_AVR_NANO))
-	#include <SoftwareSerial.h>
-	SoftwareSerial Serial1(2, 3);  //RX, TX
-	#define FPSerial Serial1
+    #include <SoftwareSerial.h>
+    SoftwareSerial Serial1(2, 3);  //RX, TX
+    #define FPSerial Serial1
 #else
-	#define FPSerial Serial1
+    #define FPSerial Serial1
 #endif
 
 DFRobot_ID809 fingerprint;
-String errorDescriptions;
+String desc;
 
 void setup(){
   /*初始化打印串口*/
@@ -35,14 +35,13 @@ void setup(){
   /*等待Serial打开*/
   while(!Serial);
   /*测试设备与主控是否能正常通讯,
-    通讯成功返回0，
-    通讯失败返回ERR_ID809
+    返回true or false
     */
-  while(fingerprint.isConnected() == ERR_ID809){
+  while(fingerprint.isConnected() == false){
     Serial.println("与设备通讯失败，请检查接线");
     /*获取错误码信息*/
-    errorDescriptions = fingerprint.getErrorDescription();
-    Serial.println(errorDescriptions);
+    desc = fingerprint.getErrorDescription();
+    Serial.println(desc);
     delay(1000);
   }
 }
