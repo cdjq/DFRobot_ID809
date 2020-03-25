@@ -34,11 +34,12 @@ bool DFRobot_ID809::begin(Stream &s_){
     return true;
 }
 
-uint8_t DFRobot_ID809::testConnection(){
+uint8_t DFRobot_ID809::isConnected(){
 	pCmdPacketHeader_t header = pack(CMDTYPE, CMD_TEST_CONNECTION, NULL, 0);
 	sendPacket(header);
-	uint8_t ret = responsePayload(buf);
 	free(header);
+	uint8_t ret = responsePayload(buf);
+	LDBG("ret=");LDBG(ret);
 	return ret;
 }
 
@@ -120,11 +121,13 @@ String DFRobot_ID809::getDeviceInfo(){
 	char *data;
 	uint8_t result;
 	pCmdPacketHeader_t header = pack(CMDTYPE, CMD_DEVICE_INFO, NULL, 0);
-	//LDBG("\r\n");//保证发送包是正确的
 	sendPacket(header);
 	free(header);
 	result = responsePayload(buf);
-	//LDBG("result=");LDBG(result);
+	LDBG("result=");LDBG(result);
+	if(result != ERR_SUCCESS){
+		return "";
+	}
 	uint16_t dataLen = buf[0]+(buf[1]<<8)+1;
 	if((data = (char *)malloc(dataLen)) == NULL){
 		LDBG("no memory!!!\r\n");
@@ -132,8 +135,8 @@ String DFRobot_ID809::getDeviceInfo(){
 	}
 	data[dataLen] = 0;
 	result = responsePayload(data);
-	//LDBG("result=");LDBG(result);//2个包都是正确的
-	String ret=String(data);
+	LDBG("result=");LDBG(result);
+	String ret = String(data);
 	free(data);
 	return ret;
 }
@@ -141,36 +144,40 @@ String DFRobot_ID809::getDeviceInfo(){
 
 uint8_t DFRobot_ID809::setModuleSN(uint8_t* SN){
 	uint8_t data[2];
-	uint8_t ret;
 	data[0] = 16;
 	if(strlen(SN) > 16){
 		LDBG("SN号超过15位");
-		return 0;
+		return ERR_ID809;
 	}
 	pCmdPacketHeader_t header = pack(CMDTYPE, CMD_SET_MODULE_SN, data, 2);
 	sendPacket(header);
 	free(header);
+	uint8_t ret = responsePayload(buf);
+	LDBG("ret=");LDBG(ret);
+	if(ret != ERR_SUCCESS){
+		return ERR_ID809;
+	}
+	header = pack(DATATYPE, CMD_SET_MODULE_SN, SN, 16);
+	sendPacket(header);
+	free(header);
 	ret = responsePayload(buf);
 	LDBG("ret=");LDBG(ret);
-	if(ret != 0){
-		pCmdPacketHeader_t header = pack(DATATYPE, CMD_SET_MODULE_SN, SN, 16);
-		sendPacket(header);
-		free(header);
-		ret = responsePayload(buf);
-		LDBG("ret=");LDBG(ret);
+	if(ret == ERR_SUCCESS){
+		ret = buf[0];
 	}
 	return ret;
 }
 
 String DFRobot_ID809::getModuleSN(){
 	char *data;
-	uint8_t result;
 	pCmdPacketHeader_t header = pack(CMDTYPE, CMD_GET_MODULE_SN, NULL, 0);
-	//LDBG("\r\n");//保证发送包是正确的
 	sendPacket(header);
 	free(header);
-	result = responsePayload(buf);
-	//LDBG("result=");LDBG(result);
+	uint8_t result = responsePayload(buf);
+	LDBG("result=");LDBG(result);
+	if(result != ERR_SUCCESS){
+		return "";
+	}
 	uint16_t dataLen = buf[0]+(buf[1]<<8)+1;
 	if((data = (char *)malloc(dataLen)) == NULL){
 		LDBG("no memory!!!\r\n");
@@ -178,8 +185,8 @@ String DFRobot_ID809::getModuleSN(){
 	}
 	data[dataLen] = 0;
 	result = responsePayload(data);
-	//LDBG("result=");LDBG(result);//2个包都是正确的
-	String ret=String(data);
+	LDBG("result=");LDBG(result);
+	String ret = String(data);
 	free(data);
 	return ret;
 }
@@ -191,21 +198,21 @@ uint8_t DFRobot_ID809::LEDCtrl(eLED_MODE_t mode,eLED_COLOR_t color,uint8_t blink
 	data[3] = blinkCount;
 	pCmdPacketHeader_t header = pack(CMDTYPE, CMD_SLED_CTRL, data, 4);
 	sendPacket(header);
+	free(header);
 	uint8_t ret = responsePayload(buf);
 	LDBG("ret=");LDBG(ret);
-	free(header);
 	return ret;
 }
 
 uint8_t DFRobot_ID809::detectFinger(){
 	pCmdPacketHeader_t header = pack(CMDTYPE, CMD_FINGER_DETECT, NULL, 0);
 	sendPacket(header);
+	free(header);
 	uint8_t ret = responsePayload(buf);
 	LDBG("ret=");LDBG(ret);
-	if(ret == 0){
+	if(ret == ERR_SUCCESS){
 		ret = buf[0];
 	}
-	free(header);
 	return ret;
 }
 
@@ -215,12 +222,12 @@ uint8_t DFRobot_ID809::getEmptyID(){
 	data[2] = 80;     //该模块最多80个指纹，默认全部范围
 	pCmdPacketHeader_t header = pack(CMDTYPE, CMD_GET_EMPTY_ID, data, 4);
 	sendPacket(header);
+	free(header);
 	uint8_t ret = responsePayload(buf);
 	LDBG("ret=");LDBG(ret);
-	if(ret == 0){
+	if(ret == ERR_SUCCESS){
 		ret = buf[0];
 	}
-	free(header);
 	return ret;
 }
 
@@ -229,12 +236,12 @@ uint8_t DFRobot_ID809::getStatusID(uint8_t ID){
 	data[0] = ID;
 	pCmdPacketHeader_t header = pack(CMDTYPE, CMD_GET_STATUS, data, 2);
 	sendPacket(header);
+	free(header);
 	uint8_t ret = responsePayload(buf);
 	LDBG("ret=");LDBG(ret);
-	if(ret == 0){
+	if(ret == ERR_SUCCESS){
 		ret = buf[0];
 	}
-	free(header);
 	return ret;
 }
 
@@ -244,59 +251,63 @@ uint8_t DFRobot_ID809::getEnrollCount(){
 	data[2] = 80;
 	pCmdPacketHeader_t header = pack(CMDTYPE, CMD_GET_ENROLL_COUNT, data, 4);
 	sendPacket(header);
+	free(header);
 	uint8_t ret = responsePayload(buf);
 	LDBG("ret=");LDBG(ret);
-	if(ret == 0){
+	if(ret == ERR_SUCCESS){
 		ret = buf[0];
 	}
-	free(header);
 	return ret;
 }
 
 #define  getID(A, V)  (A[0 + V/8] & (0x01 << (V & 0x07)))
-String DFRobot_ID809::getEnrolledIDList()
+uint8_t DFRobot_ID809::getEnrolledIDList(uint8_t* buf)
 {
 	char *data;
-	char IDList[80] = {0};
+	uint8_t i = 0;
 	pCmdPacketHeader_t header = pack(CMDTYPE, CMD_GET_ENROLLED_ID_LIST, NULL, 0);
-	//LDBG("\r\n");//保证发送包是正确的
 	sendPacket(header);
 	free(header);
-	uint8_t result = responsePayload(buf);
-	//LDBG("result=");LDBG(result);
-	uint16_t dataLen = buf[0]+(buf[1]<<8)+1;
+	uint8_t ret = responsePayload(buf);
+	LDBG("ret=");LDBG(ret);
+	uint16_t dataLen = buf[0]+(buf[1]<<8);
 	if((data = (char *)malloc(dataLen)) == NULL){
 		LDBG("no memory!!!\r\n");
 		while(1);
 	}
-	data[dataLen] = 0;
-	result = responsePayload(data);
-	//LDBG("result=");LDBG(result);//2个包都是正确的
-	uint8_t j = 0;
-	for(uint8_t i = 0; i < (dataLen*8); i++){
-		if(getID(data, i) != 0){
-			IDList[j] = i;
-			j++;
+	ret = responsePayload(data);
+	LDBG("ret=");LDBG(ret);
+	if(ret != ERR_SUCCESS){
+		ret = ERR_ID809;
+	}else{
+		for(uint16_t j = 0; j < (dataLen*8); j++){
+			if(getID(data, j) != 0){
+				buf[i] = j;
+				i++;
+			}
 		}
 	}
-	String ret=String(IDList);
 	free(data);
 	return ret;
 }
 
-uint8_t DFRobot_ID809::storeFingerprint(uint8_t ID){
+uint8_t DFRobot_ID809::storeFingerprint(uint8_t ID){      //？？？？？
 	uint8_t data[4] = {0};
 	uint8_t ret = merge();
+	LDBG("ret=");LDBG(ret);
+	if(ret != ERR_SUCCESS){
+		return ERR_ID809;
+	}
 	_number = 0;
 	data[0] = ID;
 	pCmdPacketHeader_t header = pack(CMDTYPE, CMD_STORE_CHAR, data, 4);
 	sendPacket(header);
 	ret = responsePayload(buf);
-	if(ret == 0x18){
+	LDBG("ret=");LDBG(ret);
+	if((ret == ERR_DUPLICATION_ID)){
 		LDBG("该指纹已注册");
 		ret = buf[0];
 	}
-	LDBG("ret=");LDBG(ret);
 	free(header);
 	return ret;
 	
@@ -312,9 +323,9 @@ uint8_t DFRobot_ID809::delFingerprint(uint8_t ID){
 	}
 	pCmdPacketHeader_t header = pack(CMDTYPE, CMD_DEL_CHAR, data, 4);
 	sendPacket(header);
+	free(header);
 	uint8_t ret = responsePayload(buf);
 	LDBG("ret=");LDBG(ret);
-	free(header);
 	return ret;
 }
 
@@ -325,14 +336,16 @@ uint8_t DFRobot_ID809::search(){
 	_number = 0;
 	pCmdPacketHeader_t header = pack(CMDTYPE, CMD_SEARCH, data, 6);
 	sendPacket(header);
-	uint8_t ret = responsePayload(buf);
-	if(ret == 0){
-		ret = buf[0];
-	}else{
-		LDBG("ret=");LDBG(ret);
-		ret = 0;
-	}
 	free(header);
+	uint8_t ret = responsePayload(buf);
+	LDBG("ret=");LDBG(ret);
+	if(ret == ERR_SUCCESS){
+		ret = buf[0];
+	}else if(ret == ERR_ALL_TMPL_EMPTY){
+		ret = 0;
+	}else{
+		ret = ERR_ID809;
+	}
 	return ret;
 }
 
@@ -342,14 +355,16 @@ uint8_t DFRobot_ID809::verify(uint8_t ID){
 	_number = 0;
 	pCmdPacketHeader_t header = pack(CMDTYPE, CMD_VERIFY, data, 4);
 	sendPacket(header);
-	uint8_t ret = responsePayload(buf);
-	if(ret == 0){
-		ret = buf[0];
-	}else{
-		LDBG("ret=");LDBG(ret);
-		ret = 0;
-	}
 	free(header);
+	uint8_t ret = responsePayload(buf);
+	LDBG("ret=");LDBG(ret);
+	if(ret == ERR_SUCCESS){
+		ret = buf[0];
+	}else if(ret == ERR_TMPL_EMPTY){
+		ret = 0;
+	}else{
+		ret = ERR_ID809;
+	}
 	return ret;
 }
 
@@ -359,13 +374,16 @@ uint8_t DFRobot_ID809::match(uint8_t RamBufferID0, uint8_t RamBufferID1){
 	data[2] = RamBufferID1;
 	pCmdPacketHeader_t header = pack(CMDTYPE, CMD_MATCH, data, 4);
 	sendPacket(header);
+	free(header);
 	uint8_t ret = responsePayload(buf);
 	LDBG("ret=");LDBG(ret);
-	if(ret == 0)
-	{
+	if(ret == ERR_SUCCESS){
 		ret = buf[0];
+	}else if(ret == ERR_VERIFY){
+		ret = 0;
+	}else{
+		ret = ERR_ID809;
 	}
-	free(header);
 	return ret;
 }
 
@@ -375,13 +393,12 @@ uint8_t DFRobot_ID809::getBrokenQuantity(){
 	data[2] = 80;
 	pCmdPacketHeader_t header = pack(CMDTYPE, CMD_GET_BROKEN_ID, data, 4);
 	sendPacket(header);
+	free(header);
 	uint8_t ret = responsePayload(buf);
 	LDBG("ret=");LDBG(ret);
-	if(ret == 0)
-	{
+	if(ret == ERR_SUCCESS){
 		ret = buf[0];
 	}
-	free(header);
 	return ret;
 }
 
@@ -391,13 +408,12 @@ uint8_t DFRobot_ID809::getBrokenID(){
 	data[2] = 80;
 	pCmdPacketHeader_t header = pack(CMDTYPE, CMD_GET_BROKEN_ID, data, 4);
 	sendPacket(header);
+	free(header);
 	uint8_t ret = responsePayload(buf);
 	LDBG("ret=");LDBG(ret);
-	if(ret == 0)
-	{
-		ret = buf[0];
+	if(ret == ERR_SUCCESS){
+		ret = buf[2];
 	}
-	free(header);
 	return ret;
 }
 
@@ -407,86 +423,89 @@ uint8_t DFRobot_ID809::loadChar(uint8_t ID, uint8_t RamBufferID){
 	data[2] = RamBufferID;
 	pCmdPacketHeader_t header = pack(CMDTYPE, CMD_LOAD_CHAR, data, 4);
 	sendPacket(header);
+	free(header);
 	uint8_t ret = responsePayload(buf);
 	LDBG("ret=");LDBG(ret);
-	free(header);
 	return ret;
 }
 
 uint8_t DFRobot_ID809::enterStandbyState(){
 	pCmdPacketHeader_t header = pack(CMDTYPE, CMD_ENTER_STANDBY_STATE, NULL, 0);
 	sendPacket(header);
+	free(header);
 	uint8_t ret = responsePayload(buf);
 	LDBG("ret=");LDBG(ret);
-	free(header);
 	return ret;
 }
-/**********************************************************************/
 
 uint8_t DFRobot_ID809::setParam(uint8_t* data){
 	pCmdPacketHeader_t header = pack(CMDTYPE, CMD_SET_PARAM, data, 5);
 	sendPacket(header);
+	free(header);
 	uint8_t ret = responsePayload(buf);
 	LDBG("ret=");LDBG(ret);
-	free(header);
 	return ret;
 }
 
 uint8_t DFRobot_ID809::getParam(uint8_t* data){
 	pCmdPacketHeader_t header = pack(CMDTYPE, CMD_GET_PARAM, data, 1);
 	sendPacket(header);
+	free(header);
 	uint8_t ret = responsePayload(buf);
 	LDBG("ret=");LDBG(ret);
 	if(ret == ERR_SUCCESS){
 		ret = buf[0];
 	}
-	free(header);
 	return ret;
 }
 
 uint8_t DFRobot_ID809::getImage(){
 	pCmdPacketHeader_t header = pack(CMDTYPE, CMD_GET_IMAGE, NULL, 0);
 	sendPacket(header);
+	free(header);
 	uint8_t ret = responsePayload(buf);
 	LDBG("ret=");LDBG(ret);
-	free(header);
 	return ret;
 }
 
 uint8_t DFRobot_ID809::fingerprintCollection(uint16_t timeout){  //采集指纹
-	uint8_t ret;
 	uint16_t i = 0;
+	uint8_t ret;
+	if(_number > 2){
+		_error = ERR_GATHER_OUT;
+		LDBG("超过采集次数上限");
+		return ERR_ID809;
+	}
 	while(!detectFinger()){
 		delay(10);
 		if(++i > timeout*10){
-			ret = ERR_TIME_OUT;
+			_error = ERR_TIME_OUT;
 			LDBG("采集超时");
 			LDBG("ret=");LDBG(ret);
-			return ret;
+			return ERR_ID809;
 		}
 	}
 	ret = getImage();
 	LDBG("ret=");LDBG(ret);
-	if(_number > 2){
-		ret = ERR_GATHER_OUT;
-		LDBG("超过采集次数上限");
+	if(ret != ERR_SUCCESS){
+		return ERR_ID809;
 	}
-	if(ret == 0){
-		ret = generate(_number);
-		_number++;
-		LDBG("ret=");LDBG(ret);
+	ret = generate(_number);
+	LDBG("ret=");LDBG(ret);
+	if(ret != ERR_SUCCESS){
+		return ERR_ID809;
 	}
+	_number++;
 	return ret;
 }
 
 uint8_t DFRobot_ID809::generate(uint8_t RamBufferID){
-	uint8_t ret;
 	uint8_t data[2] = {0};
 	data[0] = RamBufferID;
 	pCmdPacketHeader_t header = pack(CMDTYPE, CMD_GENERATE, data, 2);
 	sendPacket(header);
-	ret = responsePayload(buf);
 	free(header);
+	uint8_t ret = responsePayload(buf);
 	LDBG("ret=");LDBG(ret);
 	return ret;
 }
@@ -496,9 +515,9 @@ uint8_t DFRobot_ID809::merge(){
 	data[2] = _number;
 	pCmdPacketHeader_t header = pack(CMDTYPE, CMD_MERGE, data, 3);
 	sendPacket(header);
+	free(header);
 	uint8_t ret = responsePayload(buf);
 	LDBG("ret=");LDBG(ret);
-	free(header);
 	return ret;
 }
 
@@ -548,9 +567,10 @@ uint8_t DFRobot_ID809::responsePayload(void* buf){
 	uint8_t ch,ret;
 	int16_t type;
 	type = readPrefix(&header);
-	if(type < 0){
-		LDBG("--readPacketPrefix error---");
-		return 0;
+	if(type == 1){
+		LDBG("--recv timeout---");
+		_error = ERR_RECV_TIMEOUT;
+		return ERR_ID809;
 	}
 	pRcmPacketHeader_t packet;
 	if(type == RCMTYPE){
@@ -572,15 +592,17 @@ uint8_t DFRobot_ID809::responsePayload(void* buf){
     dataCount = readN(packet->payload, dataLen);
 	cks = packet->payload[dataLen-2]+(packet->payload[dataLen-1]<<8);
 	ret = (header.RET&0xFF);
-	if(ret != 0){
-		LDBG("--ERR CODE---");
-	}
-    if(dataLen != dataCount){
+	_error = ret;
+	if(ret != ERR_SUCCESS){
+		ret = ERR_ID809;
+	}else if(dataLen != dataCount){
 		LDBG("--recvRspPacket length error---");
-		ret = ERR_RECV_LENGTH;
+		_error = ERR_RECV_LENGTH;
+		ret = ERR_ID809;
 	}else if(getRcmCKS(packet) != cks){
 		LDBG("--recvRspPacket cks error---");
-		ret = ERR_RECV_CKS;
+		_error = ERR_RECV_CKS;
+		ret = ERR_ID809;
 	}else{
 		//LDBG("--recvRspPacket OK---");
 		memcpy(buf, packet->payload, dataLen);
@@ -602,7 +624,7 @@ uint16_t DFRobot_ID809::readPrefix( pRcmPacketHeader_t header ){
 	while(state != RECV_HEADER_OK){
 		if(readN(&ch, 1) != 1){
 			ret = 1;
-			break;
+			return ret;
 		}
 		if((ch == 0xAA) && (state == RECV_HEADER_INIT)){
 			state = RECV_HEADER_AA;
@@ -691,6 +713,45 @@ uint16_t DFRobot_ID809::getRcmCKS(pRcmPacketHeader_t packet){
 		}
 	}
 	return cks&0xFFFF;
+}
+
+const DFRobot_ID809::sErrorDescription_t DFRobot_ID809::errorDescriptionsTable[]={
+  {eErrorSuccess, "Success"},
+  {eErrorFail, "Fail"},
+  {eErrorVerify, "Verify"},
+  {eErrorIdentify, "Identify"},
+  {eErrorTmplEmpty, "TmplEmpty"},
+  {eErrorTmplNotEmpty, "TmplNotEmpty"},
+  {eErrorAllTmplEmpty, "AllTmplEmpty"},
+  {eErrorEmptyIDNoexist, "EmptyIDNoexist"},
+  {eErrorBrokenIDNoexist, "BrokenIDNoexist"},
+  {eErrorInvalidTmplData, "InvalidTmplData"},
+  {eErrorDuplicationID, "DuplicationID"},
+  {eErrorBadQuality, "BadQuality"},
+  {eErrorMergeFail, "MergeFail"},
+  {eErrorNotAuthorized, "NotAuthorized"},
+  {eErrorMemory, "Memory"},
+  {eErrorInvalidTmplNo, "InvalidTmplNo"},
+  {eErrorInvalidParam, "InvalidParam"},
+  {eErrorGenCount, "GenCount"},
+  {eErrorInvalidBufferID, "InvalidBufferID"},
+  {eErrorFPNotDetected, "FPNotDetected"},
+  {eErrorFPCancel, "FPCancel"},
+  {eErrorRecvLength, "RecvLength"},
+  {eErrorRecvCks, "RecvCks"},
+  {eErrorTimeOut, "TimeOut"},
+  {eErrorGatherOut, "GatherOut"},
+  {eErrorRecvTimeout,"RecvTimeout"}
+};
+
+String DFRobot_ID809::getErrorDescription()
+{
+    for(int i=0;i<sizeof(errorDescriptionsTable)/sizeof(errorDescriptionsTable[0]);i++){
+        if(_error == errorDescriptionsTable[i].error){
+          return errorDescriptionsTable[i].description;
+        }
+    }
+    return "";
 }
 
 

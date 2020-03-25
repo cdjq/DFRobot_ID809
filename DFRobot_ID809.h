@@ -99,7 +99,7 @@ public:
 #define CMD_GET_STATUS           0X0046  //检查指定的编号是否已被注册
 #define CMD_GET_BROKEN_ID        0X0047  //检查指定范围内的指纹库是否有数据损坏
 #define CMD_GET_ENROLL_COUNT     0X0048  //获取指定编号范围内已注册的指纹总数
-	#define CMD_GET_ENROLLED_ID_LIST 0X0049  //获取已注册 ID 列表
+#define CMD_GET_ENROLLED_ID_LIST 0X0049  //获取已注册 ID 列表
 #define CMD_GENERATE             0X0060  //从暂存在 IMAGEBUFFER 中的指纹图像产生模板
 #define CMD_MERGE                0X0061  //合成指纹模板数据用于入库
 #define CMD_MATCH                0X0062  //指定2个RAMBUFFER 之间的模板做比对
@@ -132,6 +132,9 @@ public:
 #define ERR_RECV_CKS             0x43    //校验码错误
 #define ERR_TIME_OUT             0x44    //采集超时
 #define ERR_GATHER_OUT           0x45    //模板采集次数超过上限
+#define ERR_RECV_TIMEOUT         0x46    //通讯超时
+
+#define ERR_ID809                0xFF    //出现错误
 
 
 public:
@@ -166,79 +169,116 @@ public:
     e460800bps,
     e921600bps
   }eDEVICE_BAUDRATE_t;
+  
+  typedef enum{
+    eErrorSuccess            = 0x00,    //指令处理成功
+    eErrorFail               = 0x01,    //指令处理失败
+    eErrorVerify             = 0x10,    //与指定编号中 Template 的 1:1 比对失败
+    eErrorIdentify           = 0x11,    //已进行 1:N 比对， 但相同 Template 不存在
+    eErrorTmplEmpty          = 0x12,    //在指定编号中不存在已注册的 Template 
+    eErrorTmplNotEmpty       = 0x13,    //在指定编号中已存在 Template 
+    eErrorAllTmplEmpty       = 0x14,    //不存在已注册的 Template 
+    eErrorEmptyIDNoexist     = 0x15,    //不存在可注册的 Template ID 
+    eErrorBrokenIDNoexist    = 0x16,    //不存在已损坏的 Template 
+    eErrorInvalidTmplData    = 0x17,    //指定的 Template Data 无效
+    eErrorDuplicationID      = 0x18,    //该指纹已注册
+    eErrorBadQuality         = 0x19,    //指纹图像质量不好
+    eErrorMergeFail          = 0x1A,    //Template 合成失败
+    eErrorNotAuthorized      = 0x1B,    //没有进行通讯密码确认
+    eErrorMemory             = 0x1C,    //外部 Flash 烧写出错
+    eErrorInvalidTmplNo      = 0x1D,    //指定 Template 编号无效
+    eErrorInvalidParam       = 0x22,    //使用了不正确的参数
+    eErrorGenCount           = 0x25,    //指纹合成个数无效
+    eErrorInvalidBufferID    = 0x26,    //Buffer ID 值不正确
+    eErrorFPNotDetected      = 0x28,    //采集器上没有指纹输入
+    eErrorFPCancel           = 0x41,    //指令被取消
+    eErrorRecvLength         = 0x42,    //接收数据长度错误
+    eErrorRecvCks            = 0x43,    //校验码错误
+    eErrorTimeOut            = 0x44,    //采集超时
+    eErrorGatherOut          = 0x45,    //模板采集次数超过上限
+    eErrorRecvTimeout        = 0x46     ////通讯超时
+  }eError_t;
+  
+  typedef struct{
+    /**< Gesture enumeration variable X */
+    eError_t error;    //命名？？？？？？？？？？？？？？
+    /**< Description about the gesture enumeration variable X */
+    const char * description;
+  }sErrorDescription_t;
 
+public:
   DFRobot_ID809();
   ~DFRobot_ID809();
   bool begin(Stream &s_);
   
   /**
    * @brief 测试模块是否正常连接
-   * @return 0(succeed) or Error Code
+   * @return 0(succeed) or ERR_ID809
    */
-  uint8_t testConnection();
+  uint8_t isConnected();
   
   /**
    * @brief 设置模块ID
    * @param ID号:1-255
-   * @return 0(succeed) or Error Code
+   * @return 0(succeed) or ERR_ID809
    */
   uint8_t setDeviceID(uint8_t DeviceID);
   
   /**
    * @brief 设置模块安全等级
    * @param 安全等级:1-5
-   * @return 0(succeed) or Error Code
+   * @return 0(succeed) or ERR_ID809
    */
   uint8_t setSecurityLevel(uint8_t SecurityLevel);
   
   /**
    * @brief 设置模块指纹重复检查(在保存指纹时，检查是否已被注册)
    * @param 1(ON) or 0(OFF)
-   * @return 0(succeed) or Error Code
+   * @return 0(succeed) or ERR_ID809
    */
   uint8_t setDuplicationCheck(uint8_t DuplicationCheck);
   
   /**
    * @brief 设置模块波特率
    * @param Baudrate:in typedef enum eDEVICE_BAUDRATE_t
-   * @return 0(succeed) or Error Code
+   * @return 0(succeed) or ERR_ID809
    */
   uint8_t setBaudrate(eDEVICE_BAUDRATE_t Baudrate);
   
   /**
    * @brief 设置模块自学功能(在对比指纹成功时，更新指纹)
    * @param 1(ON) or 0(OFF)
-   * @return 0(succeed) or Error Code
+   * @return 0(succeed) or ERR_ID809
    */
   uint8_t setAutoLearn(uint8_t AutoLearn);
   
   /**
    * @brief 读取模块ID
-   * @return ID号:1-255 or Error Code
+   * @return ID号:1-255 or ERR_ID809
    */
   uint8_t getDeviceID();
   
   /**
    * @brief 读取模块安全等级
-   * @return 安全等级:1-5 or Error Code
+   * @return 安全等级:1-5 or ERR_ID809
    */
   uint8_t getSecurityLevel();
   
   /**
    * @brief 读取模块指纹重复检查状态
-   * @return 状态：1(ON) or 0(OFF)
+   * @return 状态：1(ON)、0(OFF) or ERR_ID809
    */
   uint8_t getDuplicationCheck();
   
   /**
    * @brief 读取模块波特率
-   * @return Baudrate:in typedef enum eDEVICE_BAUDRATE_t or Error Code
+   * @return Baudrate:in typedef enum eDEVICE_BAUDRATE_t or ERR_ID809
    */
   uint8_t getBaudrate();
   
   /**
    * @brief 读取模块自学功能状态
-   * @return 状态：1(ON) or 0(OFF)
+   * @return 状态：1(ON)、0(OFF) or ERR_ID809
    */
   uint8_t getAutoLearn();
    
@@ -251,7 +291,7 @@ public:
   /**
    * @brief 设置序列号
    * @param 字符串指针
-   * @return 0(succeed) or Error Code
+   * @return 0(succeed) or ERR_ID809
    */
   uint8_t setModuleSN(uint8_t* SN);
   /**
@@ -265,13 +305,13 @@ public:
    * @param mode:in typedef enum eLED_MODE_t
    * @param color:in typedef enum eLED_COLOR_t
    * @param 闪烁次数
-   * @return 0(succeed) or Error Code
+   * @return 0(succeed) or ERR_ID809
    */
   uint8_t LEDCtrl(eLED_MODE_t mode,eLED_COLOR_t color,uint8_t blinkCount);
   
   /**
    * @brief 检测是否有手指触碰
-   * @return 1(有手指) or 0(无手指)
+   * @return 1(有手指)、0(无手指) or ERR_ID809
    */
   uint8_t detectFinger();
   
@@ -283,49 +323,51 @@ public:
   
   /**
    * @brief 检查ID是否已被注册
-   * @return 0(已注册) or 1(未注册)
+   * @return 0(已注册)、1(未注册) or ERR_ID809
    */
   uint8_t getStatusID(uint8_t ID);
   
   /**
    * @brief 获取注册用户数量
-   * @return 注册用户数量 or Error Code
+   * @return 注册用户数量 or ERR_ID809
    */
   uint8_t getEnrollCount();
   
- 
-  //获取已注册用户ID
-   String getEnrolledIDList();
+  /**
+   * @brief 获取已注册用户列表
+   * @return 0(succeed) or ERR_ID809
+   */
+   uint8_t getEnrolledIDList(uint8_t* buf);
   
   /**
    * @brief 采集指纹
-   * @return 0(succeed) or Error Code
+   * @return 0(succeed) or ERR_ID809
    */
   uint8_t fingerprintCollection(uint16_t timeout);
   
   /**
    * @brief 保存指纹
    * @param 指纹ID
-   * @return 0(succeed) or Error Code
+   * @return 0(succeed) or ERR_ID809
    */
   uint8_t storeFingerprint(uint8_t ID);
   
   /**
    * @brief 删除指纹
    * @param 指纹ID or DELALL(全部删除)
-   * @return 0(succeed) or Error Code
+   * @return 0(succeed) or ERR_ID809
    */
   uint8_t delFingerprint(uint8_t ID);
   
   /**
    * @brief 将指纹与全部指纹匹配
-   * @return 匹配成功的指纹ID or 0(匹配失败)
+   * @return 匹配成功的指纹ID、0(匹配失败) or ERR_ID809
    */
   uint8_t search();
 
   /**
    * @brief 将指纹与指定指纹匹配
-   * @return 匹配成功的指纹ID or 0(匹配失败)
+   * @return 匹配成功的指纹ID、0(匹配失败) or ERR_ID809
    */
   uint8_t verify(uint8_t ID);
 
@@ -333,19 +375,19 @@ public:
    * @brief 指定两个RamBuffer的模板进行对比
    * @param RamBuffer号
    * @param RamBuffer号
-   * @return 0(succeed) or Error Code
+   * @return 0(succeed) or ERR_ID809
    */
   uint8_t match(uint8_t RamBufferID0, uint8_t RamBufferID1);
   
   /**
    * @brief 得到指纹损坏数量
-   * @return 损坏的指纹ID号
+   * @return 损坏的指纹ID号 or ERR_ID809
    */
   uint8_t getBrokenQuantity();
 
   /**
    * @brief 得到第一个损坏指纹ID
-   * @return 损坏的指纹ID号
+   * @return 损坏的指纹ID号 or ERR_ID809
    */
   uint8_t getBrokenID();
   
@@ -353,15 +395,17 @@ public:
    * @brief 取出指纹模板，暂存到RamBuffer中
    * @param 指纹ID号
    * @param RamBuffer号
-   * @return 0(succeed) or Error Code
+   * @return 0(succeed) or ERR_ID809
    */
   uint8_t loadChar(uint8_t ID, uint8_t RamBufferID);
   
   /**
    * @brief 进入休眠状态
-   * @return 0(succeed) or Error Code
+   * @return 0(succeed) or ERR_ID809
    */
   uint8_t enterStandbyState();
+  
+  String getErrorDescription();
   
   bool setDbgSerial(Stream &s_){dbg = &s_; return true;}
 protected:
@@ -415,8 +459,11 @@ private:
   uint8_t buf[20];
   pCmdPacketHeader_t  sendHeader;
   pRcmPacketHeader_t  recHeader;
-
-  uint8_t _number = 0;            //指纹采集次数
+  
+  static const sErrorDescription_t /*PROGMEM*/ errorDescriptionsTable[26]; 
+  
+  uint8_t _number = 0;       //指纹采集次数
+  eError_t _error;        //错误码
 };
 
 #endif

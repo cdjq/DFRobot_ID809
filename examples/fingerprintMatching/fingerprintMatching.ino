@@ -13,20 +13,36 @@
 */
 #include <DFRobot_ID809.h>
 
-DFRobot_ID809 finger;
+/*如果使用UNO或NANO，则使用软串口*/
+#if ((defined ARDUINO_AVR_UNO) || (defined ARDUINO_AVR_NANO))
+	#include <SoftwareSerial.h>
+	SoftwareSerial Serial1(2, 3);  //RX, TX
+	#define FPSerial Serial1
+#else
+	#define FPSerial Serial1
+#endif
+
+DFRobot_ID809 fingerprint;
+String errorDescriptions;
 
 void setup(){
   /*初始化打印串口*/
   Serial.begin(9600);
   /*初始化Serial1*/
-  Serial1.begin(115200);
+  FPSerial.begin(115200);
   /*将Serial1作为指纹模块的通讯串口*/
-  finger.begin(Serial1);
+  fingerprint.begin(FPSerial);
   /*等待Serial打开*/
   while(!Serial);
-  /*测试设备与主控是否能正常通讯*/
-  while(finger.testConnection()){
+  /*测试设备与主控是否能正常通讯,
+    通讯成功返回0，
+    通讯失败返回ERR_ID809
+    */
+  while(fingerprint.isConnected() == ERR_ID809){
     Serial.println("与设备通讯失败，请检查接线");
+    /*获取错误码信息*/
+    errorDescriptions = fingerprint.getErrorDescription();
+    Serial.println(errorDescriptions);
     delay(1000);
   }
 }
@@ -44,34 +60,48 @@ void loop(){
     eLEDCyan   eLEDMagenta  eLEDWhite
     <闪烁次数> 0表示一直闪烁
     */
-  finger.LEDCtrl(finger.eBreathing, finger.eLEDBlue, /*flashing number = */0);
+  fingerprint.LEDCtrl(/*LEDMode = */fingerprint.eBreathing, /*LEDColor = */fingerprint.eLEDBlue, /*blinkCount = */0);
   Serial.println("请按下手指");
-  /*采集指纹图像，超过10S没按下手指则采集超时*/
-  if((ret = finger.fingerprintCollection(/*timeout=*/10)) == 0){
+  /*采集指纹图像，超过10S没按下手指则采集超时
+    如果获取成功返回0，否则返回ERR_ID809
+   */
+  if((ret = fingerprint.fingerprintCollection(/*timeout=*/10)) != ERR_ID809){
     /*设置指纹灯环为黄色快闪3次*/
-    finger.LEDCtrl(finger.eFastBlink, finger.eLEDYellow, /*flashing number = */3);
+    fingerprint.LEDCtrl(/*LEDMode = */fingerprint.eFastBlink, /*LEDColor = */fingerprint.eLEDYellow, /*blinkCount = */3);
     Serial.println("采集成功");
   }else{
-    //打印ret对应的错误码
     Serial.println("采集失败");
+    /*获取错误码信息*/
+    errorDescriptions = fingerprint.getErrorDescription();
+    Serial.println(errorDescriptions);
   }
   Serial.println("请松开手指");
-  /*等待手指松开*/
-  while(finger.detectFinger());
+  /*等待手指松开
+    检测到手指返回1，否则返回0
+   */
+  while(fingerprint.detectFinger());
   
-  /*将采集到的指纹与指纹库中的所有指纹对比，成功返回指纹编号，失败返回0*/
-  ret = finger.search();
-  //ret = finger.verify(1);  //将采集到的指纹与指纹库中的1号指纹对比
-  
-  if(ret){
+  /*将采集到的指纹与指纹库中的所有指纹对比，
+    成功返回指纹编号(1-80)，失败返回0
+   */
+  ret = fingerprint.search();
+  /*将采集到的指纹与指定编号指纹对比
+    成功返回指纹编号(1-80)，失败返回0
+   */
+  //ret = fingerprint.verify(/*Fingerprint ID = */1);  
+  if(ret == 0){
+    /*设置指纹灯环为红色常亮*/
+    fingerprint.LEDCtrl(/*LEDMode = */fingerprint.eKeepsOn, /*LEDColor = */fingerprint.eLEDRed, /*blinkCount = */0);
+    Serial.println("匹配失败");    
+  }else if(ret == ERR_ID809){
+    /*获取错误码信息*/
+    errorDescriptions = fingerprint.getErrorDescription();
+    Serial.println(errorDescriptions);
+  }else{
     /*设置指纹灯环为绿色常亮*/
-    finger.LEDCtrl(finger.eKeepsOn, finger.eLEDGreen, /*flashing number = */0);
+    fingerprint.LEDCtrl(/*LEDMode = */fingerprint.eKeepsOn, /*LEDColor = */fingerprint.eLEDGreen, /*blinkCount = */0);
     Serial.print("匹配成功,ID=");
     Serial.println(ret);
-  }else{
-    /*设置指纹灯环为红色常亮*/
-    finger.LEDCtrl(finger.eKeepsOn, finger.eLEDRed, /*flashing number = */0);
-    Serial.println("匹配失败");
   }
   Serial.println("-----------------------------");
   delay(1000);

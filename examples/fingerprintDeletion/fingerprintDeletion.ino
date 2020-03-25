@@ -15,30 +15,48 @@
 
 #define FINGERPRINTID 1   //待删除指纹的编号
 
+/*如果使用UNO或NANO，则使用软串口*/
+#if ((defined ARDUINO_AVR_UNO) || (defined ARDUINO_AVR_NANO))
+	#include <SoftwareSerial.h>
+	SoftwareSerial Serial1(2, 3);  //RX, TX
+	#define FPSerial Serial1
+#else
+	#define FPSerial Serial1
+#endif
+
 DFRobot_ID809 finger;
+String errorDescriptions;
 
 void setup(){
   /*初始化打印串口*/
   Serial.begin(9600);
   /*初始化Serial1*/
-  Serial1.begin(115200);
+  FPSerial.begin(115200);
   /*将Serial1作为指纹模块的通讯串口*/
-  finger.begin(Serial1);
+  finger.begin(FPSerial);
   /*等待Serial打开*/
   while(!Serial);
-  /*测试设备与主控是否能正常通讯*/
-  while(finger.testConnection()){
+  /*测试设备与主控是否能正常通讯,
+    通讯成功返回0，
+    通讯失败返回ERR_ID809
+    */
+  while(fingerprint.isConnected() == ERR_ID809){
     Serial.println("与设备通讯失败，请检查接线");
+    /*获取错误码信息*/
+    errorDescriptions = fingerprint.getErrorDescription();
+    Serial.println(errorDescriptions);
     delay(1000);
   }
 }
 
 void loop(){
-  //检查指纹编号是否被注册
-  if(finger.getStatusID(FINGERPRINTID)){
+  /*检查指纹编号是否被注册
+    如果已注册返回1,否则返回0
+   */
+  if(finger.getStatusID(/*Fingerprint ID = */FINGERPRINTID)){
     Serial.println("ID已注册");
-    //删除该编号的指纹
-    finger.delFingerprint(FINGERPRINTID);
+    /*删除该编号的指纹*/
+    finger.delFingerprint(/*Fingerprint ID = */FINGERPRINTID);
     //finger.delChar(DELALL);  //删除所有指纹
     Serial.println("ID已删除");
   }else{
