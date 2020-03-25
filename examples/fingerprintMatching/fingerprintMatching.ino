@@ -89,19 +89,15 @@ void loop(){
     成功返回指纹编号(1-80)，失败返回0
    */
   //ret = fingerprint.verify(/*Fingerprint ID = */1);  
-  if(ret == 0){
-    /*设置指纹灯环为红色常亮*/
-    fingerprint.LEDCtrl(/*LEDMode = */fingerprint.eKeepsOn, /*LEDColor = */fingerprint.eLEDRed, /*blinkCount = */0);
-    Serial.println("匹配失败");    
-  }else if(ret == ERR_ID809){
-    /*获取错误码信息*/
-    errorDescriptions = fingerprint.getErrorDescription();
-    Serial.println(errorDescriptions);
-  }else{
+  if(ret != 0){
     /*设置指纹灯环为绿色常亮*/
     fingerprint.LEDCtrl(/*LEDMode = */fingerprint.eKeepsOn, /*LEDColor = */fingerprint.eLEDGreen, /*blinkCount = */0);
     Serial.print("匹配成功,ID=");
     Serial.println(ret);
+  }else{
+    /*设置指纹灯环为红色常亮*/
+    fingerprint.LEDCtrl(/*LEDMode = */fingerprint.eKeepsOn, /*LEDColor = */fingerprint.eLEDRed, /*blinkCount = */0);
+    Serial.println("匹配失败");
   }
   Serial.println("-----------------------------");
   delay(1000);

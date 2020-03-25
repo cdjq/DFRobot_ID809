@@ -341,10 +341,8 @@ uint8_t DFRobot_ID809::search(){
 	LDBG("ret=");LDBG(ret);
 	if(ret == ERR_SUCCESS){
 		ret = buf[0];
-	}else if(ret == ERR_ALL_TMPL_EMPTY){
-		ret = 0;
 	}else{
-		ret = ERR_ID809;
+		ret = 0;
 	}
 	return ret;
 }
@@ -360,10 +358,8 @@ uint8_t DFRobot_ID809::verify(uint8_t ID){
 	LDBG("ret=");LDBG(ret);
 	if(ret == ERR_SUCCESS){
 		ret = buf[0];
-	}else if(ret == ERR_TMPL_EMPTY){
-		ret = 0;
 	}else{
-		ret = ERR_ID809;
+		ret = 0;
 	}
 	return ret;
 }
@@ -379,10 +375,8 @@ uint8_t DFRobot_ID809::match(uint8_t RamBufferID0, uint8_t RamBufferID1){
 	LDBG("ret=");LDBG(ret);
 	if(ret == ERR_SUCCESS){
 		ret = buf[0];
-	}else if(ret == ERR_VERIFY){
-		ret = 0;
 	}else{
-		ret = ERR_ID809;
+		ret = 0;
 	}
 	return ret;
 }
