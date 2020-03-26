@@ -51,14 +51,15 @@ uint8_t ret;
 void loop(){
   /*设置指纹灯环模式、颜色和闪烁次数，
     可设置参数如下：
-    <LEDMode>
+    参数1:<LEDMode>
     eBreathing   eFastBlink   eKeepsOn    eNormalClose
     eFadeIn      eFadeOut     eSlowBlink   
-    <LEDColor>
+    参数2:<LEDColor>
     eLEDGreen  eLEDRed      eLEDYellow   eLEDBlue
     eLEDCyan   eLEDMagenta  eLEDWhite
-    <闪烁次数> 0表示一直闪烁
-    */
+    参数3:<呼吸、闪烁次数> 0表示一直呼吸、闪烁，
+    该参数仅在eBreathing、eFastBlink、eSlowBlink模式下有效
+   */
   fingerprint.ctrlLED(/*LEDMode = */fingerprint.eBreathing, /*LEDColor = */fingerprint.eLEDBlue, /*blinkCount = */0);
   Serial.println("请按下手指");
   /*采集指纹图像，超过10S没按下手指则采集超时

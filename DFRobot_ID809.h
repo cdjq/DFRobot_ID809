@@ -65,8 +65,8 @@ typedef struct{
 class DFRobot_ID809{
 public: 
 
-#define FINGERPRINTCAPACITY      80      //模块指纹容量
-#define MODULESNSIZE             16      //模块SN大小
+#define FINGERPRINT_CAPACITY     80      //模块指纹容量
+#define MODULE_SN_SIZE           16      //模块SN长度
 
 
 #define DELALL                   0xFF    //删除所有指纹
@@ -76,9 +76,9 @@ public:
 #define CMD_DATA_PREFIX_CODE     0xA55A  //命令数据包前缀代码
 #define RCM_DATA_PREFIX_CODE     0x5AA5  //响应数据包前缀代码
 
-#define CMDTYPE                  0xF0    //命令包类型
-#define RCMTYPE                  0xF0    //响应包类型
-#define DATATYPE                 0x0F    //数据包类型
+#define CMD_TYPE                 0xF0    //命令包类型
+#define RCM_TYPE                 0xF0    //响应包类型
+#define DATA_TYPE                0x0F    //数据包类型
 
 #define CMD_TEST_CONNECTION      0X0001  //连接测试
 #define CMD_SET_PARAM            0X0002  //设置参数
@@ -305,7 +305,7 @@ public:
    * @brief 设置LED灯
    * @param mode:in typedef enum eLED_MODE_t
    * @param color:in typedef enum eLED_COLOR_t
-   * @param 闪烁次数
+   * @param blink Count 0表示一直呼吸、闪烁，该参数仅在eBreathing、eFastBlink、eSlowBlink模式下有效
    * @return 0(succeed) or ERR_ID809
    */
   uint8_t ctrlLED(eLEDMode_t mode,eLEDColor_t color,uint8_t blinkCount);
@@ -447,28 +447,70 @@ protected:
    */
   uint8_t merge();
   
+ /**
+   * @brief 打包数据帧
+   * @param 数据类型：CMD_TYPE or DATA_TYPE
+   * @param 命令
+   * @param 数据
+   * @param 长度
+   * @return 数据帧
+   */
   pCmdPacketHeader_t pack(uint8_t type, uint16_t cmd, const char *payload, uint16_t len);
   
+ /**
+   * @brief 发送数据
+   * @param 数据帧
+   */
   void sendPacket(pCmdPacketHeader_t header);
+  
+ /**
+   * @brief 读字节
+   * @param 用来存储数据的指针
+   * @param 需要接收数据的长度
+   * @return 实际接收长度
+   */
   size_t readN(void* buf_, size_t len);
   
+ /**
+   * @brief 读帧头
+   * @param 响应包帧头结构体
+   * @return 响应包类型：RCM_TYPE,DATA_TYPE or 1(读取超时)
+   */
   uint16_t readPrefix( pRcmPacketHeader_t header );
+  
+ /**
+   * @brief 读数据
+   * @param 用来存储数据的指针
+   * @return 0(success) or ERR_ID809
+   */
   uint8_t responsePayload(void* buf);
   
+ /**
+   * @brief 获取命令包CKS
+   * @param 命令包帧
+   * @return CKS
+   */
   uint16_t getCmdCKS(pCmdPacketHeader_t packet);
+  
+ /**
+   * @brief 获取响应包CKS
+   * @param 响应包帧
+   * @return CKS
+   */
   uint16_t getRcmCKS(pRcmPacketHeader_t packet);
 
   
 private:
   Stream *s;
-  uint8_t buf[20];
+  uint8_t buf[20];     //用来存储响应包的数据
   pCmdPacketHeader_t  sendHeader;
   pRcmPacketHeader_t  recHeader;
   
-  static const sErrorDescription_t /*PROGMEM*/ errorDescriptionsTable[26]; 
+  static const sErrorDescription_t /*PROGMEM*/ errorDescriptionsTable[26];   //错误信息列表
   
   uint8_t _number = 0;       //指纹采集次数
   eError_t _error;           //错误码
+  uint16_t _PacketSize = 0;  //需要发送的数据包长度
 };
 
 #endif

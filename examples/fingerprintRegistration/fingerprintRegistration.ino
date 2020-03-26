@@ -82,7 +82,7 @@ void loop(){
       eLEDCyan   eLEDMagenta  eLEDWhite
       参数3:<呼吸、闪烁次数> 0表示一直呼吸、闪烁，
       该参数仅在eBreathing、eFastBlink、eSlowBlink模式下有效
-      */
+     */
     fingerprint.ctrlLED(/*LEDMode = */fingerprint.eBreathing, /*LEDColor = */fingerprint.eLEDBlue, /*blinkCount = */0);
     Serial.print("正在进行第");
     Serial.print(i+1);
