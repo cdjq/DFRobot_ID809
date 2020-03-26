@@ -195,7 +195,7 @@ String DFRobot_ID809::getModuleSN(){
     return ret;
 }
 
-uint8_t DFRobot_ID809::ctrlLED(eLED_MODE_teLEDMode_t mode,eLEDColor_t color,uint8_t blinkCount){
+uint8_t DFRobot_ID809::ctrlLED(eLEDMode_t mode,eLEDColor_t color,uint8_t blinkCount){
     uint8_t data[4] = {0};
     data[0] = mode;
     data[2] = data[1] = color;
@@ -309,10 +309,6 @@ uint8_t DFRobot_ID809::storeFingerprint(uint8_t ID){
     free(header);
     ret = responsePayload(buf);
     LDBG("ret=");LDBG(ret);
-    /*if((_error == ERR_DUPLICATION_ID)){   //待定，需要抓数据
-        LDBG("该指纹已注册");
-        ret = buf[0];
-    }*/
     return ret;
     
 }

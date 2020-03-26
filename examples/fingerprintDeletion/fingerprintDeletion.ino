@@ -24,7 +24,7 @@
     #define FPSerial Serial1
 #endif
 
-DFRobot_ID809 finger;
+DFRobot_ID809 fingerprint;
 String desc;
 
 void setup(){
@@ -33,7 +33,7 @@ void setup(){
   /*初始化Serial1*/
   FPSerial.begin(115200);
   /*将Serial1作为指纹模块的通讯串口*/
-  finger.begin(FPSerial);
+  fingerprint.begin(FPSerial);
   /*等待Serial打开*/
   while(!Serial);
   /*测试设备与主控是否能正常通讯,
@@ -52,11 +52,11 @@ void loop(){
   /*检查指纹编号是否被注册
     如果已注册返回1,否则返回0
    */
-  if(finger.getStatusID(/*Fingerprint ID = */FINGERPRINTID)){
+  if(fingerprint.getStatusID(/*Fingerprint ID = */FINGERPRINTID)){
     Serial.println("ID已注册");
     /*删除该编号的指纹*/
-    finger.delFingerprint(/*Fingerprint ID = */FINGERPRINTID);
-    //finger.delChar(DELALL);  //删除所有指纹
+    fingerprint.delFingerprint(/*Fingerprint ID = */FINGERPRINTID);
+    //fingerprint.delFingerprint(DELALL);  //删除所有指纹
     Serial.println("ID已删除");
   }else{
     Serial.println("ID未注册");

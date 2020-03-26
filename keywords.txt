@@ -13,47 +13,57 @@ DFRobot_ID809	KEYWORD1
 #######################################
 
 begin	KEYWORD2
-testConnection	KEYWORD2
+isConnected	KEYWORD2
 setDeviceID	KEYWORD2
 setSecurityLevel	KEYWORD2
 setDuplicationCheck	KEYWORD2
 setBaudrate	KEYWORD2
 setAutoLearn	KEYWORD2
-readDeviceID	KEYWORD2
-readSecurityLevel	KEYWORD2
-readDuplicationCheck	KEYWORD2
-readBaudrate	KEYWORD2
-readAutoLearn	KEYWORD2
+getDeviceID	KEYWORD2
+getSecurityLevel	KEYWORD2
+getDuplicationCheck	KEYWORD2
+getBaudrate	KEYWORD2
+getAutoLearn	KEYWORD2
 getDeviceInfo	KEYWORD2
-LEDCtrl	KEYWORD2
+setModuleSN	KEYWORD2
+getModuleSN	KEYWORD2
+ctrlLED	KEYWORD2
 detectFinger	KEYWORD2
 getEmptyID	KEYWORD2
 getStatusID	KEYWORD2
 getEnrollCount	KEYWORD2
-setCollectNumber	KEYWORD2
-generate	KEYWORD2
-storeChar	KEYWORD2
-delChar	KEYWORD2
+getEnrolledIDList	KEYWORD2
+collectionFingerprint	KEYWORD2
+storeFingerprint	KEYWORD2
+delFingerprint	KEYWORD2
 search	KEYWORD2
 verify	KEYWORD2
+match	KEYWORD2
+getBrokenQuantity	KEYWORD2
+getBrokenID	KEYWORD2
+loadFingerprint	KEYWORD2
 enterStandbyState	KEYWORD2
+getErrorDescription	KEYWORD2
+setDbgSerial	KEYWORD2
 
 #######################################
 # Constants (LITERAL1)
 #######################################
 
-eLEDMode1	LITERAL1
-eLEDMode2	LITERAL1
-eLEDMode3	LITERAL1
-eLEDMode4	LITERAL1
-eLEDMode5	LITERAL1
-LEDGreen	LITERAL1
-LEDRed	LITERAL1
-LEDYellow	LITERAL1
-LEDBlue	LITERAL1
-LEDCyan	LITERAL1
-LEDMagenta	LITERAL1
-LEDWhite	LITERAL1
+eBreathing	LITERAL1
+eFastBlink	LITERAL1
+eKeepsOn	LITERAL1
+eNormalClose	LITERAL1
+eFadeIn	LITERAL1
+eFadeOut	LITERAL1
+eSlowBlink	LITERAL1
+eLEDGreen	LITERAL1
+eLEDRed	LITERAL1
+eLEDYellow	LITERAL1
+eLEDBlue	LITERAL1
+eLEDCyan	LITERAL1
+eLEDMagenta	LITERAL1
+eLEDWhite	LITERAL1
 e9600bps	LITERAL1
 e19200bps	LITERAL1
 e38400bps	LITERAL1

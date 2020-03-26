@@ -1,21 +1,8 @@
-# DFRobot_CCS811
-This sensor is used to measure the concentration of carbon dioxide and TVOC(TotalVolatileOrganicCompounds) via IIC within measurement range 400-8000ppm(parts per million) for the former and 0-1100ppb(parts per billion) for the latter. It features small size, low power consumption, high accuracy and short pre-heat time. Besides, this sensor provides grade 1 MSL(moisture sensitivity level), which makes the sensor suitable for all kinds of moist operating conditions. Meanwhile, users can input environment parameter to calibrate the output data. <br>
-
-Carbon dioxide concentration(ppm)  | Impact on human-beings
------------------- | ---------
-more than 5000        |      toxic 
-2500-5000        |      unhealthy to human body
-1000-2500        |      feel sleepy 
-500-1000        |      turbid air
-less than 500        |      no effect
-
-TVOC concentration (ppb)     | Impact on human-beings
------------------- | ---------
-less than 50        |      no effect 
-50-750        |      uncomfortable, nervous 
-760-6000        |      uncomfortable, nervous, headache
-more than 6000       |      headache, neurological problems 
-
+# DFRobot_ID809
+该电容指纹模块集指纹采集、处理、存储及指纹比对为一体。
+以ID809高性能处理器和半导体指纹传感器为核心，内置 IDfinger6.0指纹算法，能够独立完成全部的指纹识别工作。
+该模块采用标准UART通讯，配合Arduino库，非常容易实现指纹录入、图像处理、模板生成、指纹比对等所有指纹识别功能。
+该模块外观精致轻薄一体化，具有环形炫酷呼吸灯，指纹识别速度快、安全性高，支持360度任意角度识别、深度自学习功能、高性能、低功耗。
 <br>
 <img src="./image/SEN0318-image.jpg">
 <br>
@@ -37,11 +24,10 @@ more than 6000       |      headache, neurological problems
 
 ## Summary
 
-1. Read carbon dioxide concentration (Unit:ppm) <br>
-2. Read TVOC concentration (Unit:ppb) <br>
-3. Change the sampling interval of data reading to change power consumption <br>
-4. Set environment parameter to calibrate the readings <br>
-5. Supports for interrupt measurement <br>
+1. 注册指纹 <br>
+2. 匹配指纹 <br>
+3. 删除指纹 <br>
+4. 支持休眠模式 <br>
 
 ## Installation
 
@@ -53,157 +39,203 @@ To use this library, first download the library file, paste it into the \Arduino
 
   /**
    * @brief 测试模块是否正常连接
-   * @return 1(succeed) or 0(defeated)
+   * @return true or false
    */
-  uint8_t testConnection();
+  bool isConnected();
   
   /**
    * @brief 设置模块ID
    * @param ID号:1-255
-   * @return 1(succeed) or 0(defeated)
+   * @return 0(succeed) or ERR_ID809
    */
-  uint8_t setDeviceID(uint8_t DeviceID);
+  uint8_t setDeviceID(uint8_t deviceID);
   
   /**
    * @brief 设置模块安全等级
    * @param 安全等级:1-5
-   * @return 1(succeed) or 0(defeated)
+   * @return 0(succeed) or ERR_ID809
    */
-  uint8_t setSecurityLevel(uint8_t SecurityLevel);
+  uint8_t setSecurityLevel(uint8_t securityLevel);
   
   /**
    * @brief 设置模块指纹重复检查(在保存指纹时，检查是否已被注册)
    * @param 1(ON) or 0(OFF)
-   * @return 1(succeed) or 0(defeated)
+   * @return 0(succeed) or ERR_ID809
    */
-  uint8_t setDuplicationCheck(uint8_t DuplicationCheck);
+  uint8_t setDuplicationCheck(uint8_t duplicationCheck);
   
   /**
    * @brief 设置模块波特率
    * @param Baudrate:in typedef enum eDEVICE_BAUDRATE_t
-   * @return 1(succeed) or 0(defeated)
+   * @return 0(succeed) or ERR_ID809
    */
-  uint8_t setBaudrate(eDEVICE_BAUDRATE_t Baudrate);
+  uint8_t setBaudrate(eDeviceBaudrate_t baudrate);
   
   /**
    * @brief 设置模块自学功能(在对比指纹成功时，更新指纹)
    * @param 1(ON) or 0(OFF)
-   * @return 1(succeed) or 0(defeated)
+   * @return 0(succeed) or ERR_ID809
    */
-  uint8_t setAutoLearn(uint8_t AutoLearn);
+  uint8_t setAutoLearn(uint8_t autoLearn);
   
   /**
    * @brief 读取模块ID
-   * @return ID号:1-255
+   * @return ID号:1-255 or ERR_ID809
    */
-  uint8_t readDeviceID();
+  uint8_t getDeviceID();
   
   /**
    * @brief 读取模块安全等级
-   * @return 安全等级:1-5
+   * @return 安全等级:1-5 or ERR_ID809
    */
-  uint8_t readSecurityLevel();
+  uint8_t getSecurityLevel();
   
   /**
    * @brief 读取模块指纹重复检查状态
-   * @return 1(ON) or 0(OFF)
+   * @return 状态：1(ON)、0(OFF) or ERR_ID809
    */
-  uint8_t readDuplicationCheck();
+  uint8_t getDuplicationCheck();
   
   /**
    * @brief 读取模块波特率
-   * @return Baudrate:in typedef enum eDEVICE_BAUDRATE_t
+   * @return Baudrate:in typedef enum eDEVICE_BAUDRATE_t or ERR_ID809
    */
-  uint8_t readBaudrate();
+  uint8_t getBaudrate();
   
   /**
    * @brief 读取模块自学功能状态
-   * @return 1(ON) or 0(OFF)
+   * @return 状态：1(ON)、0(OFF) or ERR_ID809
    */
-  uint8_t readAutoLearn();
+  uint8_t getAutoLearn();
    
   /**
    * @brief 读取设备号
-   * @return 1(succeed) or 0(defeated)
+   * @return 设备号
    */
-  uint8_t getDeviceInfo();
+  String getDeviceInfo();
+  
+  /**
+   * @brief 设置序列号
+   * @param 字符串指针
+   * @return 0(succeed) or ERR_ID809
+   */
+  uint8_t setModuleSN(uint8_t* SN);
+  /**
+   * @brief 读取序列号
+   * @return 序列号
+   */
+  String getModuleSN();
   
   /**
    * @brief 设置LED灯
    * @param mode:in typedef enum eLED_MODE_t
    * @param color:in typedef enum eLED_COLOR_t
    * @param 闪烁次数
-   * @return 1(succeed) or 0(defeated)
+   * @return 0(succeed) or ERR_ID809
    */
-  uint8_t LEDCtrl(eLED_MODE_t mode,eLED_COLOR_t color,uint8_t blinkCount);
+  uint8_t ctrlLED(eLEDMode_t mode,eLEDColor_t color,uint8_t blinkCount);
   
   /**
    * @brief 检测是否有手指触碰
-   * @return 1(succeed) or 0(defeated)
+   * @return 1(有手指)、0(无手指) or ERR_ID809
    */
   uint8_t detectFinger();
   
   /**
    * @brief 获取可注册首个编号
-   * @return 可注册ID号
+   * @return 可注册ID号 or Error Code
    */
   uint8_t getEmptyID();
   
   /**
    * @brief 检查ID是否已被注册
-   * @return 1(已注册) or 0(未注册)
+   * @return 0(已注册)、1(未注册) or ERR_ID809
    */
   uint8_t getStatusID(uint8_t ID);
   
   /**
    * @brief 获取注册用户数量
-   * @return 注册用户数量
+   * @return 注册用户数量 or ERR_ID809
    */
   uint8_t getEnrollCount();
   
   /**
-   * @brief 设置指纹采集次数
-   * @param 采集次数:1-3
+   * @brief 获取已注册用户列表
+   * @return 0(succeed) or ERR_ID809
    */
-   void setCollectNumber(uint8_t number);
+   uint8_t getEnrolledIDList(uint8_t* buf);
   
   /**
-   * @brief 获取指纹
-   * @return 1(succeed) or 0(defeated)
+   * @brief 采集指纹
+   * @return 0(succeed) or ERR_ID809
    */
-  uint8_t generate();
+  uint8_t collectionFingerprint(uint16_t timeout);
   
   /**
    * @brief 保存指纹
    * @param 指纹ID
-   * @return 1(succeed) or 0(defeated)
+   * @return 0(succeed) or ERR_ID809
    */
-  uint8_t storeChar(uint8_t ID);
+  uint8_t storeFingerprint(uint8_t ID);
   
   /**
    * @brief 删除指纹
    * @param 指纹ID or DELALL(全部删除)
-   * @return 1(succeed) or 0(defeated)
+   * @return 0(succeed) or ERR_ID809
    */
-  uint8_t delChar(uint8_t ID);
+  uint8_t delFingerprint(uint8_t ID);
   
   /**
    * @brief 将指纹与全部指纹匹配
-   * @return 匹配成功的指纹ID or 0(defeated)
+   * @return 匹配成功的指纹ID、0(匹配失败) or ERR_ID809
    */
   uint8_t search();
 
   /**
    * @brief 将指纹与指定指纹匹配
-   * @return 1(succeed) or 0(defeated)
+   * @return 匹配成功的指纹ID、0(匹配失败) or ERR_ID809
    */
   uint8_t verify(uint8_t ID);
+
+  /**
+   * @brief 指定两个RamBuffer的模板进行对比
+   * @param RamBuffer号
+   * @param RamBuffer号
+   * @return 0(succeed) or ERR_ID809
+   */
+  uint8_t match(uint8_t RamBufferID0, uint8_t RamBufferID1);
+  
+  /**
+   * @brief 得到指纹损坏数量
+   * @return 损坏的指纹ID号 or ERR_ID809
+   */
+  uint8_t getBrokenQuantity();
+
+  /**
+   * @brief 得到第一个损坏指纹ID
+   * @return 损坏的指纹ID号 or ERR_ID809
+   */
+  uint8_t getBrokenID();
+  
+  /**
+   * @brief 取出指纹模板，暂存到RamBuffer中
+   * @param 指纹ID号
+   * @param RamBuffer号 0-2
+   * @return 0(succeed) or ERR_ID809
+   */
+  uint8_t loadFingerprint(uint8_t ID, uint8_t RamBufferID);
   
   /**
    * @brief 进入休眠状态
-   * @return 1(succeed) or 0(defeated)
+   * @return 0(succeed) or ERR_ID809
    */
   uint8_t enterStandbyState();
+  
+  /**
+   * @brief 获取错误信息
+   * @return 错误信息的文本描述
+   */
+  String getErrorDescription();
 ```
 
 ## Compatibility
@@ -219,13 +251,13 @@ micro:bit        |      √       |              |             |
 
 ## History
 
-- Data 2019-7-19
+- Data 2020-3-26
 - Version V0.1
 
 
 ## Credits
 
-Written by(yufeng.luo@dfrobot.com), 2019. (Welcome to our [website](https://www.dfrobot.com/))
+Written by(Eddard.liu@dfrobot.com), 2020. (Welcome to our [website](https://www.dfrobot.com/))
 
 
 

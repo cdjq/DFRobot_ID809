@@ -202,7 +202,7 @@ public:
   
   typedef struct{
     /**< Gesture enumeration variable X */
-    eError_t error;    //命名？？？？？？？？？？？？？？
+    eError_t error;
     /**< Description about the gesture enumeration variable X */
     const char * description;
   }sErrorDescription_t;
@@ -468,7 +468,7 @@ private:
   static const sErrorDescription_t /*PROGMEM*/ errorDescriptionsTable[26]; 
   
   uint8_t _number = 0;       //指纹采集次数
-  eError_t _error;        //错误码
+  eError_t _error;           //错误码
 };
 
 #endif

@@ -28,7 +28,7 @@
     #define FPSerial Serial1
 #endif
 
-DFRobot_ID809 fingerprintprint;
+DFRobot_ID809 fingerprint;
 String desc;
 
 void setup(){
@@ -106,7 +106,7 @@ void loop(){
     /*等待手指松开
       检测到手指返回1，否则返回0
      */
-    while(fingerprint.detectfinger());
+    while(fingerprint.detectFinger());
   }
   
   /*将指纹信息保存到一个未注册的编号中*/
