@@ -312,7 +312,7 @@ public:
   
   /**
    * @brief 检测是否有手指触碰
-   * @return 1(有手指)、0(无手指) or ERR_ID809
+   * @return 1(有手指) or 0(无手指)
    */
   uint8_t detectFinger();
   
