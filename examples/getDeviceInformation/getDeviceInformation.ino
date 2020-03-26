@@ -50,7 +50,7 @@ uint8_t enrollCount;   //已注册用户数
 
 void loop(){
   /*设置模块ID号，可设置值1-255*/
-  //setDeviceID(/*Device ID = */1);
+  //fingerprint.setDeviceID(/*Device ID = */1);
   Serial.print("模块ID为:");
   /*读取模块ID*/
   Serial.println(fingerprint.getDeviceID());
@@ -68,7 +68,7 @@ void loop(){
       Level 5          认假率 FAR  0.0001%
                        拒真率 FRR  1%
    */
-  //setSecurityLevel(/*Security Level = */3);
+  //fingerprint.setSecurityLevel(/*Security Level = */3);
   Serial.print("模块安全等级为:");
   /*读取模块安全等级*/
   Serial.println(fingerprint.getSecurityLevel());
@@ -79,20 +79,20 @@ void loop(){
     e115200bps  e230400bps  e460800bps  e921600bps
        5           6            7          8
    */
-  //setBaudrate(fingerprint.e115200bps);
+  //fingerprint.setBaudrate(fingerprint.e115200bps);
   Serial.print("模块波特率为:");
   /*读取模块波特率*/
   Serial.println(fingerprint.getBaudrate());
   
   /*设置模块自学功能，1(ON) 0(OFF)*/
-  //setAutoLearn(/*Auto Learn = */1);
+  //fingerprint.setAutoLearn(/*Auto Learn = */1);
   Serial.print("模块自学功能:");
   /*读取模块自学功能状态
     如果开启则打印ON,否则打印OFF*/
   Serial.println(fingerprint.getAutoLearn()?"ON":"OFF");
   
   /*设置模块序列号,序列号字符数必须小于15个*/
-  //setModuleSN(/*Module SN = */"DFRobot");
+  //fingerprint.setModuleSN(/*Module SN = */"DFRobot");
   Serial.print("模块序列号为:");
   /*读取模块序列号*/
   Serial.println(fingerprint.getModuleSN());
