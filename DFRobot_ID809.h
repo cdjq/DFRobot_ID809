@@ -108,33 +108,6 @@ public:
 #define CMD_SEARCH               0X0063  //指定编号范围的1:N识别
 #define CMD_VERIFY               0X0064  //指定 RAMBUFFER 与指纹库中指定编号的模板比对
 
-
-#define ERR_SUCCESS              0x00    //指令处理成功
-#define ERR_FAIL                 0x01    //指令处理失败
-#define ERR_VERIFY               0x10    //与指定编号中 Template 的 1:1 比对失败
-#define ERR_IDENTIFY             0x11    //已进行 1:N 比对， 但相同 Template 不存在
-#define ERR_TMPL_EMPTY           0x12    //在指定编号中不存在已注册的 Template 
-#define ERR_TMPL_NOT_EMPTY       0x13    //在指定编号中已存在 Template 
-#define ERR_ALL_TMPL_EMPTY       0x14    //不存在已注册的 Template 
-#define ERR_EMPTY_ID_NOEXIST     0x15    //不存在可注册的 Template ID 
-#define ERR_BROKEN_ID_NOEXIST    0x16    //不存在已损坏的 Template 
-#define ERR_INVALID_TMPL_DATA    0x17    //指定的 Template Data 无效
-#define ERR_DUPLICATION_ID       0x18    //该指纹已注册
-#define ERR_BAD_QUALITY          0x19    //指纹图像质量不好
-#define ERR_MERGE_FAIL           0x1A    //Template 合成失败
-#define ERR_NOT_AUTHORIZED       0x1B    //没有进行通讯密码确认
-#define ERR_MEMORY               0x1C    //外部 Flash 烧写出错
-#define ERR_INVALID_TMPL_NO      0x1D    //指定 Template 编号无效
-#define ERR_INVALID_PARAM        0x22    //使用了不正确的参数
-#define ERR_GEN_COUNT            0x25    //指纹合成个数无效
-#define ERR_INVALID_BUFFER_ID    0x26    //Buffer ID 值不正确
-#define ERR_FP_NOT_DETECTED      0x28    //采集器上没有指纹输入
-#define ERR_FP_CANCEL            0x41    //指令被取消
-#define ERR_RECV_LENGTH          0x42    //接收数据长度错误
-#define ERR_RECV_CKS             0x43    //校验码错误
-#define ERR_TIME_OUT             0x44    //采集超时
-#define ERR_GATHER_OUT           0x45    //模板采集次数超过上限
-#define ERR_RECV_TIMEOUT         0x46    //通讯超时
 #define ERR_ID809                0xFF    //出现错误
 
 
@@ -294,7 +267,7 @@ public:
    * @param 字符串指针
    * @return 0(succeed) or ERR_ID809
    */
-  uint8_t setModuleSN(uint8_t* SN);
+  uint8_t setModuleSN(const char* SN);
   /**
    * @brief 读取序列号
    * @return 序列号
@@ -498,7 +471,6 @@ protected:
    * @return CKS
    */
   uint16_t getRcmCKS(pRcmPacketHeader_t packet);
-
   
 private:
   Stream *s;
