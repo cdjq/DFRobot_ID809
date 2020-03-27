@@ -263,7 +263,7 @@ uint8_t DFRobot_ID809::getEnrollCount(){
 }
 
 #define  getID(A, V)  (A[0 + V/8] & (0x01 << (V & 0x07)))
-uint8_t DFRobot_ID809::getEnrolledIDList(uint8_t* buf)
+uint8_t DFRobot_ID809::getEnrolledIDList(uint8_t* list)
 {
     char *data;
     uint8_t i = 0;
@@ -284,7 +284,7 @@ uint8_t DFRobot_ID809::getEnrolledIDList(uint8_t* buf)
     }else{
         for(uint16_t j = 0; j < (dataLen*8); j++){
             if(getID(data, j) != 0){
-                buf[i] = j;
+                list[i] = j;
                 i++;
             }
         }

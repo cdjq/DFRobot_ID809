@@ -37,6 +37,13 @@ To use this library, first download the library file, paste it into the \Arduino
 
 ```C++
   /**
+   * @brief 初始化通讯串口
+   * @param 硬串口 or 软串口
+   * @return true or false
+   */
+  bool begin(Stream &s_);
+
+  /**
    * @brief 测试模块是否正常连接
    * @return true or false
    */
@@ -118,7 +125,7 @@ To use this library, first download the library file, paste it into the \Arduino
    * @param 字符串指针
    * @return 0(succeed) or ERR_ID809
    */
-  uint8_t setModuleSN(uint8_t* SN);
+  uint8_t setModuleSN(const char* SN);
   /**
    * @brief 读取序列号
    * @return 序列号
@@ -162,7 +169,7 @@ To use this library, first download the library file, paste it into the \Arduino
    * @brief 获取已注册用户列表
    * @return 0(succeed) or ERR_ID809
    */
-   uint8_t getEnrolledIDList(uint8_t* buf);
+   uint8_t getEnrolledIDList(uint8_t* list);
   
   /**
    * @brief 采集指纹
@@ -235,93 +242,6 @@ To use this library, first download the library file, paste it into the \Arduino
    * @return 错误信息的文本描述
    */
   String getErrorDescription();
-  
-  bool setDbgSerial(Stream &s_){dbg = &s_; return true;}
-protected:
-   /**
-   * @brief 设置参数
-   * @param 数据类型+数据
-   * @return 0(succeed) or ERR_ID809
-   */
-  uint8_t setParam(uint8_t* data);
-  
-   /**
-   * @brief 读取参数
-   * @param 数据类型
-   * @return 数据 or ERR_ID809
-   */
-  uint8_t getParam(uint8_t* data);
-  
-  /**
-   * @brief 采集指纹图像
-   * @return 0(succeed) or ERR_ID809
-   */
-  uint8_t getImage();
-   
-   /**
-   * @brief 将图像生成模板
-   * @param Ram Buffer 编号
-   * @return 0(succeed) or ERR_ID809
-   */
-  uint8_t generate(uint8_t RamBufferID);
-  
- /**
-   * @brief 合成指纹
-   * @return 0(succeed) or ERR_ID809
-   */
-  uint8_t merge();
-  
- /**
-   * @brief 打包数据帧
-   * @param 数据类型：CMD_TYPE or DATA_TYPE
-   * @param 命令
-   * @param 数据
-   * @param 长度
-   * @return 数据帧
-   */
-  pCmdPacketHeader_t pack(uint8_t type, uint16_t cmd, const char *payload, uint16_t len);
-  
- /**
-   * @brief 发送数据
-   * @param 数据帧
-   */
-  void sendPacket(pCmdPacketHeader_t header);
-  
- /**
-   * @brief 读字节
-   * @param 用来存储数据的指针
-   * @param 需要接收数据的长度
-   * @return 实际接收长度
-   */
-  size_t readN(void* buf_, size_t len);
-  
- /**
-   * @brief 读帧头
-   * @param 响应包帧头结构体
-   * @return 响应包类型：RCM_TYPE,DATA_TYPE or 1(读取超时)
-   */
-  uint16_t readPrefix( pRcmPacketHeader_t header );
-  
- /**
-   * @brief 读数据
-   * @param 用来存储数据的指针
-   * @return 0(success) or ERR_ID809
-   */
-  uint8_t responsePayload(void* buf);
-  
- /**
-   * @brief 获取命令包CKS
-   * @param 命令包帧
-   * @return CKS
-   */
-  uint16_t getCmdCKS(pCmdPacketHeader_t packet);
-  
- /**
-   * @brief 获取响应包CKS
-   * @param 响应包帧
-   * @return CKS
-   */
-  uint16_t getRcmCKS(pRcmPacketHeader_t packet);
 ```
 
 ## Compatibility
@@ -332,6 +252,9 @@ Arduino uno        |      √       |              |             |
 Mega2560        |      √       |              |             | 
 Leonardo        |      √       |              |             | 
 ESP32        |         √    |              |             | 
+ESP8266        |         √    |              |             | 
+FireBeetle M0      |         √    |              |             | 
+
 
 
 ## History

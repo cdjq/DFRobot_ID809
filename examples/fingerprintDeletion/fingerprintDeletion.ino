@@ -30,9 +30,9 @@ String desc;
 void setup(){
   /*初始化打印串口*/
   Serial.begin(9600);
-  /*初始化Serial1*/
+  /*初始化FPSerial*/
   FPSerial.begin(115200);
-  /*将Serial1作为指纹模块的通讯串口*/
+  /*将FPSerial作为指纹模块的通讯串口*/
   fingerprint.begin(FPSerial);
   /*等待Serial打开*/
   while(!Serial);

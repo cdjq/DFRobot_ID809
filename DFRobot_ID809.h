@@ -184,6 +184,12 @@ public:
 public:
   DFRobot_ID809();
   ~DFRobot_ID809();
+  
+  /**
+   * @brief 初始化通讯串口
+   * @param 硬串口 or 软串口
+   * @return true or false
+   */
   bool begin(Stream &s_);
   
   /**
@@ -292,7 +298,7 @@ public:
   
   /**
    * @brief 获取可注册首个编号
-   * @return 可注册ID号 or Error Code
+   * @return 可注册ID号 or ERR_ID809
    */
   uint8_t getEmptyID();
   
@@ -312,7 +318,7 @@ public:
    * @brief 获取已注册用户列表
    * @return 0(succeed) or ERR_ID809
    */
-   uint8_t getEnrolledIDList(uint8_t* buf);
+   uint8_t getEnrolledIDList(uint8_t* list);
   
   /**
    * @brief 采集指纹
