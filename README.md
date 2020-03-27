@@ -331,8 +331,7 @@ MCU                | Work Well    | Work Wrong   | Untested    | Remarks
 Arduino uno        |      √       |              |             | 
 Mega2560        |      √       |              |             | 
 Leonardo        |      √       |              |             | 
-ESP32        |             |        √      |             | 
-micro:bit        |             |       √       |             | 
+ESP32        |         √    |              |             | 
 
 
 ## History

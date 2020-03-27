@@ -723,13 +723,13 @@ const DFRobot_ID809::sErrorDescription_t DFRobot_ID809::errorDescriptionsTable[]
   {eErrorMemory, "Memory"},
   {eErrorInvalidTmplNo, "InvalidTmplNo"},
   {eErrorInvalidParam, "InvalidParam"},
+  {eErrorTimeOut, "TimeOut"},
   {eErrorGenCount, "GenCount"},
   {eErrorInvalidBufferID, "InvalidBufferID"},
   {eErrorFPNotDetected, "FPNotDetected"},
   {eErrorFPCancel, "FPCancel"},
   {eErrorRecvLength, "RecvLength"},
   {eErrorRecvCks, "RecvCks"},
-  {eErrorTimeOut, "TimeOut"},
   {eErrorGatherOut, "GatherOut"},
   {eErrorRecvTimeout,"RecvTimeout"}
 };

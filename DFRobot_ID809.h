@@ -108,6 +108,7 @@ public:
 #define CMD_SEARCH               0X0063  //指定编号范围的1:N识别
 #define CMD_VERIFY               0X0064  //指定 RAMBUFFER 与指纹库中指定编号的模板比对
 
+#define ERR_SUCCESS              0x00    //指令处理成功
 #define ERR_ID809                0xFF    //出现错误
 
 
@@ -162,13 +163,13 @@ public:
     eErrorMemory             = 0x1C,    //外部 Flash 烧写出错
     eErrorInvalidTmplNo      = 0x1D,    //指定 Template 编号无效
     eErrorInvalidParam       = 0x22,    //使用了不正确的参数
+    eErrorTimeOut            = 0x23,    //采集超时
     eErrorGenCount           = 0x25,    //指纹合成个数无效
     eErrorInvalidBufferID    = 0x26,    //Buffer ID 值不正确
     eErrorFPNotDetected      = 0x28,    //采集器上没有指纹输入
     eErrorFPCancel           = 0x41,    //指令被取消
     eErrorRecvLength         = 0x42,    //接收数据长度错误
     eErrorRecvCks            = 0x43,    //校验码错误
-    eErrorTimeOut            = 0x44,    //采集超时
     eErrorGatherOut          = 0x45,    //模板采集次数超过上限
     eErrorRecvTimeout        = 0x46     ////通讯超时
   }eError_t;
