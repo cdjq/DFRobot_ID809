@@ -53,9 +53,6 @@ void setup(){
   }
 }
 
-unsigned long time = 0;
-uint8_t wakeUpFlag = 1;  //指纹模块唤醒标志位
-
 //蓝灯 匹配模式  绿灯 注册模式  红灯  删除模式
 void loop(){
   if(digitalRead(WAKEUP)){
@@ -105,14 +102,6 @@ void loop(){
       /*删除该指纹*/
       fingerprintDeletion();
     }
-    time = millis();
-    wakeUpFlag = 1;
-  }
-
-  if(wakeUpFlag == 1 && (millis()-time) > 5000){
-    wakeUpFlag = 0;
-    /*指纹模块进入休眠*/
-    fingerprint.enterStandbyState();
   }
 }
 
