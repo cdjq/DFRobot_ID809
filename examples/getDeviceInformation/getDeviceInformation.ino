@@ -73,7 +73,7 @@ void loop(){
   /*读取模块安全等级*/
   Serial.println(fingerprint.getSecurityLevel());
   
-  /*设置模块波特率，可设置范围如下所示(默认波特率为115200)：
+  /*设置模块波特率，可设置范围如下所示：
     e9600bps    e19200bps   e38400bps   e57600bps
        1           2            3          4
     e115200bps  e230400bps  e460800bps  e921600bps

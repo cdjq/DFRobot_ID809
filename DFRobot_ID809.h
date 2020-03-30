@@ -221,7 +221,7 @@ public:
   
   /**
    * @brief 设置模块波特率
-   * @param Baudrate:in typedef enum eDEVICE_BAUDRATE_t
+   * @param Baudrate:in typedef enum eDeviceBaudrate_t
    * @return 0(succeed) or ERR_ID809
    */
   uint8_t setBaudrate(eDeviceBaudrate_t baudrate);
@@ -283,9 +283,9 @@ public:
   
   /**
    * @brief 设置LED灯
-   * @param mode:in typedef enum eLED_MODE_t
-   * @param color:in typedef enum eLED_COLOR_t
-   * @param blink Count 0表示一直呼吸、闪烁，该参数仅在eBreathing、eFastBlink、eSlowBlink模式下有效
+   * @param mode:in typedef enum eLEDMode_t
+   * @param color:in typedef enum eLEDColor_t
+   * @param blink Count: 0表示一直呼吸、闪烁，该参数仅在eBreathing、eFastBlink、eSlowBlink模式下有效
    * @return 0(succeed) or ERR_ID809
    */
   uint8_t ctrlLED(eLEDMode_t mode,eLEDColor_t color,uint8_t blinkCount);

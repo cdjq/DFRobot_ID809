@@ -65,7 +65,7 @@ void loop(){
   /*采集指纹图像，超过10S没按下手指则采集超时
     如果获取成功返回0，否则返回ERR_ID809
    */
-  if((ret = fingerprint.collectionFingerprint(/*timeout=*/10)) != ERR_ID809){
+  if((fingerprint.collectionFingerprint(/*timeout=*/10)) != ERR_ID809){
     /*设置指纹灯环为黄色快闪3次*/
     fingerprint.ctrlLED(/*LEDMode = */fingerprint.eFastBlink, /*LEDColor = */fingerprint.eLEDYellow, /*blinkCount = */3);
     Serial.println("采集成功");

@@ -464,7 +464,7 @@ uint8_t DFRobot_ID809::collectionFingerprint(uint16_t timeout){  //采集指纹
     uint16_t i = 0;
     uint8_t ret;
     if(_number > 2){
-        _error = eErrorGatherOut;//////////////////////////////////////////////////
+        _error = eErrorGatherOut;
         LDBG("超过采集次数上限");
         return ERR_ID809;
     }

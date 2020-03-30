@@ -1,6 +1,6 @@
 /*!
  * @file fingerprintDeletion.ino
- * @brief 采集指纹并保存
+ * @brief 删除指定指纹
  * @n 实验现象：检查ID是否被注册，如果已注册则删除，
                 如果未注册则提示ID未注册
  * @copyright  Copyright (c) 2010 DFRobot Co.Ltd (http://www.dfrobot.com)
