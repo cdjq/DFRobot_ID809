@@ -135,6 +135,7 @@ void fingerprintMatching(){
   delay(1000);
   /*关闭指纹灯环*/
   fingerprint.ctrlLED(/*LEDMode = */fingerprint.eNormalClose, /*LEDColor = */fingerprint.eLEDBlue, /*blinkCount = */0);
+  Serial.println("-----------------------------");
 }
 
 //注册指纹
@@ -193,7 +194,6 @@ void fingerprintRegistration(){
   if(fingerprint.storeFingerprint(/*Empty ID = */ID) != ERR_ID809){
     Serial.print("保存成功，ID=");
     Serial.println(ID);
-    Serial.println("-----------------------------");
     /*设置指纹灯环为绿色常亮*/
     fingerprint.ctrlLED(/*LEDMode = */fingerprint.eKeepsOn, /*LEDColor = */fingerprint.eLEDGreen, /*blinkCount = */0);
     delay(1000);
@@ -205,6 +205,7 @@ void fingerprintRegistration(){
     desc = fingerprint.getErrorDescription();
     Serial.println(desc);
   }
+  Serial.println("-----------------------------");
 }
 
 
@@ -229,4 +230,5 @@ void fingerprintDeletion(){
   delay(1000);
   /*关闭指纹灯环*/
   fingerprint.ctrlLED(/*LEDMode = */fingerprint.eNormalClose, /*LEDColor = */fingerprint.eLEDBlue, /*blinkCount = */0);
+  Serial.println("-----------------------------");
 }

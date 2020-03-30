@@ -1,7 +1,7 @@
 /*!
  * @file fingerprintMatching.ino
  * @brief 采集指纹并与指纹库中指纹做对比
- * @n 实验现象：采集指纹图像并与指纹库中的指纹最对比，
+ * @n 实验现象：采集指纹图像并与指纹库中的指纹做对比，
                 对比成功亮绿色灯并打印ID号，对比失败返回0
  * @copyright  Copyright (c) 2010 DFRobot Co.Ltd (http://www.dfrobot.com)
  * @licence     The MIT License (MIT)

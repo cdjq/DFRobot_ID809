@@ -171,7 +171,7 @@ public:
     eErrorRecvLength         = 0x42,    //接收数据长度错误
     eErrorRecvCks            = 0x43,    //校验码错误
     eErrorGatherOut          = 0x45,    //模板采集次数超过上限
-    eErrorRecvTimeout        = 0x46     ////通讯超时
+    eErrorRecvTimeout        = 0x46     //通讯超时
   }eError_t;
   
   typedef struct{
