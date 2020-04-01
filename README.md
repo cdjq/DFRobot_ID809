@@ -251,8 +251,8 @@ MCU                | Work Well    | Work Wrong   | Untested    | Remarks
 Arduino uno        |      √       |              |             | 
 Mega2560        |      √       |              |             | 
 Leonardo        |      √       |              |             | 
-ESP32        |         √    |              |             | 
-ESP8266        |         √    |              |             | 
+ESP32        |         √    |              |             | 暂时兼容性不太好
+ESP8266        |         √    |              |             | 暂时兼容性不太好
 FireBeetle M0      |         √    |              |             | 
 
 
