@@ -25,7 +25,8 @@
 #include <stdint.h>
 
 //Open this macro to see the detailed running process of the program 
-#define ENABLE_DBG 0
+
+//#define ENABLE_DBG
 #ifdef ENABLE_DBG
 #define LDBG(...) if(dbg) {dbg->print("["); dbg->print(__FUNCTION__); dbg->print("(): "); dbg->print(__LINE__); dbg->print(" ] "); dbg->println(__VA_ARGS__);}
 #else
