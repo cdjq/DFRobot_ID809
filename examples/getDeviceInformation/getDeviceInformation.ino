@@ -101,7 +101,7 @@ void loop(){
   /*获取注册用户数量*/
   Serial.println(enrollCount = fingerprint.getEnrollCount());
   /*声明一个数组用来存放ID列表*/
-  uint8_t list[enrollCount] = {0};
+  uint8_t list[80] = {0};
   /*获取用户列表
     传入一个数组指针用来接收ID列表
    */
