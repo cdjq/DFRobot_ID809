@@ -1,8 +1,8 @@
 # DFRobot_ID809
-该电容指纹模块集指纹采集、处理、存储及指纹比对为一体。
-以ID809高性能处理器和半导体指纹传感器为核心，内置 IDfinger6.0指纹算法，能够独立完成全部的指纹识别工作。
-该模块采用标准UART通讯，配合Arduino库，非常容易实现指纹录入、图像处理、模板生成、指纹比对等所有指纹识别功能。
-该模块外观精致轻薄一体化，具有环形炫酷呼吸灯，指纹识别速度快、安全性高，支持360度任意角度识别、深度自学习功能、高性能、低功耗。
+This capacitive fingerprint sensor supports fingerprint capture, image processing, fingerprint storage, fingerprint comparison and so on.
+Taking ID809 high-performance processor and semiconductor fingerprint sensor as the core, the sensor adopts built-in IDfinger6.0 algorithm, which can complete all fingerprint identification work independently.
+The product supports UART communication. When working with Arduino library, it can easily realize functions like  fingerprint registration, fingerprint deletion, etc.
+This fingerprint sensor comes with round breathing LEDs and has simple structure, small size, and delicate appearance. The sensor offers fast recognition speed and high security. What’s more, it supports 360 degree arbitrary angle recognition and deep self-learning function, high performance and low power consumption.
 <br>
 <img src="./image/SEN0318-image.jpg">
 <br>
@@ -24,10 +24,10 @@
 
 ## Summary
 
-1. 注册指纹 <br>
-2. 匹配指纹 <br>
-3. 删除指纹 <br>
-4. 支持休眠模式 <br>
+1. Fingerprint Registration <br>
+2. Fingerprint Matching <br>
+3. Fingerprint Deletion <br>
+4. Supports for sleep mode <br>
 
 ## Installation
 
@@ -37,209 +37,209 @@ To use this library, first download the library file, paste it into the \Arduino
 
 ```C++
   /**
-   * @brief 初始化通讯串口
-   * @param 硬串口 or 软串口
+   * @brief Init communication serial port
+   * @param Hardware serial or Software serial
    * @return true or false
    */
   bool begin(Stream &s_);
 
   /**
-   * @brief 测试模块是否正常连接
+   * @brief Test whether the module is properly connected 
    * @return true or false
    */
   bool isConnected();
   
   /**
-   * @brief 设置模块ID
-   * @param ID号:1-255
+   * @brief Set module ID
+   * @param ID number:1-255
    * @return 0(succeed) or ERR_ID809
    */
   uint8_t setDeviceID(uint8_t deviceID);
   
   /**
-   * @brief 设置模块安全等级
-   * @param 安全等级:1-5
+   * @brief Set module security level
+   * @param Security level:1-5
    * @return 0(succeed) or ERR_ID809
    */
   uint8_t setSecurityLevel(uint8_t securityLevel);
   
   /**
-   * @brief 设置模块指纹重复检查(在保存指纹时，检查是否已被注册)
+   * @brief Set module fingerprint duplication check(check whether the fingerprint has been registrated already when saving it)
    * @param 1(ON) or 0(OFF)
    * @return 0(succeed) or ERR_ID809
    */
   uint8_t setDuplicationCheck(uint8_t duplicationCheck);
   
   /**
-   * @brief 设置模块波特率
+   * @brief Set module baud rate
    * @param Baudrate:in typedef enum eDEVICE_BAUDRATE_t
    * @return 0(succeed) or ERR_ID809
    */
   uint8_t setBaudrate(eDeviceBaudrate_t baudrate);
   
   /**
-   * @brief 设置模块自学功能(在对比指纹成功时，更新指纹)
+   * @brief Set module self-learning function(update fingerprint when fingerprint comparison succeeds)
    * @param 1(ON) or 0(OFF)
    * @return 0(succeed) or ERR_ID809
    */
   uint8_t setAutoLearn(uint8_t autoLearn);
   
   /**
-   * @brief 读取模块ID
-   * @return ID号:1-255 or ERR_ID809
+   * @brief Read module ID
+   * @return ID number:1-255 or ERR_ID809
    */
   uint8_t getDeviceID();
   
   /**
-   * @brief 读取模块安全等级
-   * @return 安全等级:1-5 or ERR_ID809
+   * @brief Read module security level
+   * @return Security level:1-5 or ERR_ID809
    */
   uint8_t getSecurityLevel();
   
   /**
-   * @brief 读取模块指纹重复检查状态
-   * @return 状态：1(ON)、0(OFF) or ERR_ID809
+   * @brief Read the fingerprint dupilcation check status of module 
+   * @return Status：1(ON), 0(OFF) or ERR_ID809
    */
   uint8_t getDuplicationCheck();
   
   /**
-   * @brief 读取模块波特率
+   * @brief Read module baud rate
    * @return Baudrate:in typedef enum eDEVICE_BAUDRATE_t or ERR_ID809
    */
   uint8_t getBaudrate();
   
   /**
-   * @brief 读取模块自学功能状态
-   * @return 状态：1(ON)、0(OFF) or ERR_ID809
+   * @brief Read the module self-learning function status 
+   * @return Status：1(ON), 0(OFF) or ERR_ID809
    */
   uint8_t getAutoLearn();
    
   /**
-   * @brief 读取设备号
-   * @return 设备号
+   * @brief Read device number 
+   * @return Device number
    */
   String getDeviceInfo();
   
   /**
-   * @brief 设置序列号
-   * @param 字符串指针
+   * @brief Set serial number 
+   * @param String pointer 
    * @return 0(succeed) or ERR_ID809
    */
   uint8_t setModuleSN(const char* SN);
   /**
-   * @brief 读取序列号
-   * @return 序列号
+   * @brief Read serial number
+   * @return Serial number
    */
   String getModuleSN();
   
   /**
-   * @brief 设置LED灯
+   * @brief Set LED light
    * @param mode:in typedef enum eLED_MODE_t
    * @param color:in typedef enum eLED_COLOR_t
-   * @param blink Count 0表示一直呼吸、闪烁，该参数仅在eBreathing、eFastBlink、eSlowBlink模式下有效
+   * @param blink Count 0 represents keeping breathing, blinking, this parameter is only valid in mode eBreathing, eFastBlink, eSlowBlink
    * @return 0(succeed) or ERR_ID809
    */
   uint8_t ctrlLED(eLEDMode_t mode,eLEDColor_t color,uint8_t blinkCount);
   
   /**
-   * @brief 检测是否有手指触碰
-   * @return 1(有手指) or 0(无手指)
+   * @brief Detect whether the module is touched by a finger 
+   * @return 1(Yes) or 0(No)
    */
   uint8_t detectFinger();
   
   /**
-   * @brief 获取可注册首个编号
-   * @return 可注册ID号 or Error Code
+   * @brief Get first registrable ID number 
+   * @return Registrable ID number or Error Code
    */
   uint8_t getEmptyID();
   
   /**
-   * @brief 检查ID是否已被注册
-   * @return 0(已注册)、1(未注册) or ERR_ID809
+   * @brief Check whether the ID has been registered
+   * @return 0(Registered), 1(Not yet) or ERR_ID809
    */
   uint8_t getStatusID(uint8_t ID);
   
   /**
-   * @brief 获取注册用户数量
-   * @return 注册用户数量 or ERR_ID809
+   * @brief Get the number of registered users 
+   * @return Number of registered users or ERR_ID809
    */
   uint8_t getEnrollCount();
   
   /**
-   * @brief 获取已注册用户列表
+   * @brief Get the list of registered users 
    * @return 0(succeed) or ERR_ID809
    */
    uint8_t getEnrolledIDList(uint8_t* list);
   
   /**
-   * @brief 采集指纹
+   * @brief Capture fingerprint
    * @return 0(succeed) or ERR_ID809
    */
   uint8_t collectionFingerprint(uint16_t timeout);
   
   /**
-   * @brief 保存指纹
-   * @param 指纹ID
+   * @brief Save fingerprint
+   * @param Fingerprint ID
    * @return 0(succeed) or ERR_ID809
    */
   uint8_t storeFingerprint(uint8_t ID);
   
   /**
-   * @brief 删除指纹
-   * @param 指纹ID or DELALL(全部删除)
+   * @brief Delete fingerprint 
+   * @param Finerprint ID or DELALL(delete all)
    * @return 0(succeed) or ERR_ID809
    */
   uint8_t delFingerprint(uint8_t ID);
   
   /**
-   * @brief 将指纹与全部指纹匹配
-   * @return 匹配成功的指纹ID、0(匹配失败) or ERR_ID809
+   * @brief Match the fingerprint with all fingerprints
+   * @return Successfully matched fingerprint ID, 0(Finerprint matching failed) or ERR_ID809
    */
   uint8_t search();
 
   /**
-   * @brief 将指纹与指定指纹匹配
-   * @return 匹配成功的指纹ID、0(匹配失败) or ERR_ID809
+   * @brief Match the fingerprint with a designated fingerprint
+   * @return Successfully matched fingerprint ID, 0(Finerprint matching failed) or ERR_ID809
    */
   uint8_t verify(uint8_t ID);
 
   /**
-   * @brief 指定两个RamBuffer的模板进行对比
-   * @param RamBuffer号
-   * @param RamBuffer号
+   * @brief Compare two designated RamBuffer templates 
+   * @param RamBuffer number
+   * @param RamBuffer number
    * @return 0(succeed) or ERR_ID809
    */
   uint8_t match(uint8_t RamBufferID0, uint8_t RamBufferID1);
   
   /**
-   * @brief 得到指纹损坏数量
-   * @return 损坏的指纹ID号 or ERR_ID809
+   * @brief Get the number of damaged fingerprints 
+   * @return Damaged fingerprint ID or ERR_ID809
    */
   uint8_t getBrokenQuantity();
 
   /**
-   * @brief 得到第一个损坏指纹ID
-   * @return 损坏的指纹ID号 or ERR_ID809
+   * @brief Get the first damaged fingerprint ID 
+   * @return Damaged fingerprint ID or ERR_ID809
    */
   uint8_t getBrokenID();
   
   /**
-   * @brief 取出指纹模板，暂存到RamBuffer中
-   * @param 指纹ID号
-   * @param RamBuffer号 0-2
+   * @brief Take out fingerprint template, temporarily save into RamBuffer
+   * @param Fingerprint ID number
+   * @param RamBuffer number 0-2
    * @return 0(succeed) or ERR_ID809
    */
   uint8_t loadFingerprint(uint8_t ID, uint8_t RamBufferID);
   
   /**
-   * @brief 进入休眠状态
+   * @brief Enter sleep status
    * @return 0(succeed) or ERR_ID809
    */
   uint8_t enterStandbyState();
   
   /**
-   * @brief 获取错误信息
-   * @return 错误信息的文本描述
+   * @brief Get error information
+   * @return Text description of error information
    */
   String getErrorDescription();
 ```
@@ -251,8 +251,8 @@ MCU                | Work Well    | Work Wrong   | Untested    | Remarks
 Arduino uno        |      √       |              |             | 
 Mega2560        |      √       |              |             | 
 Leonardo        |      √       |              |             | 
-ESP32        |         √    |              |             | 暂时兼容性不太好
-ESP8266        |         √    |              |             | 暂时兼容性不太好
+ESP32        |         √    |              |             | Compatibility is not so good currently
+ESP8266        |         √    |              |             | Compatibility is not so good currently
 FireBeetle M0      |         √    |              |             | 
 
 
