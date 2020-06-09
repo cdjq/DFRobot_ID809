@@ -1,7 +1,9 @@
 # DFRobot_ID809
 This capacitive fingerprint sensor supports fingerprint capture, image processing, fingerprint storage, fingerprint comparison and so on.
-Taking ID809 high-performance processor and semiconductor fingerprint sensor as the core, the sensor adopts built-in IDfinger6.0 algorithm, which can complete all fingerprint identification work independently.
-The product supports UART communication. When working with Arduino library, it can easily realize functions like  fingerprint registration, fingerprint deletion, etc.
+Taking ID809 high-performance processor and semiconductor fingerprint sensor as the core, the sensor adopts built-in IDfinger6.0 algorithm, which can complete all fingerprint identification work independently.<br>
+
+The product supports UART communication. When working with Arduino library, it can easily realize functions like  fingerprint registration, fingerprint deletion, etc.<br>
+
 This fingerprint sensor comes with round breathing LEDs and has simple structure, small size, and delicate appearance. The sensor offers fast recognition speed and high security. What’s more, it supports 360 degree arbitrary angle recognition and deep self-learning function, high performance and low power consumption.
 <br>
 <img src="./image/SEN0318-image.jpg">
