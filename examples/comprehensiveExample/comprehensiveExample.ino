@@ -34,19 +34,19 @@ DFRobot_ID809 fingerprint;
 String desc;
 
 void setup(){
-  /*初始化打印串口*/
+  /*Init print serial*/
   Serial.begin(9600);
-  /*初始化FPSerial*/
+  /*Init FPSerial*/
   FPSerial.begin(115200);
-  /*将FPSerial作为指纹模块的通讯串口*/
+  /*Take FPSerial as communication serial of fingerprint module*/
   fingerprint.begin(FPSerial);
-  /*等待Serial打开*/
+  /*Wait for Serial to open*/
   while(!Serial);
-  /*测试设备与主控是否能正常通讯,
-    返回true or false
+  /*Test whether the device can properly communicate with mainboard
+    Return true or false
     */
   while(fingerprint.isConnected() == false){
-    Serial.println("与设备通讯失败，请检查接线");
+    Serial.println("Communication with device failed, please check wire connection");
     /*获取错误码信息*/
     desc = fingerprint.getErrorDescription();
     Serial.println(desc);
