@@ -1,11 +1,12 @@
 /*!
  * @file comprehensiveExample.ino
- * @brief 综合示例
- * @n 该模块可以使用硬串口或软串口控制，本实验需要将IRQ引脚接到D6
- * @n 实验现象：按下手指，蓝灯快闪3次表示进入对比指纹模式
- * @n           黄灯快闪3次，表示进入指纹注册模式
- * @n           红灯快闪3次，表示进入删除指纹模式，删除该指纹
- * @n           空闲5秒后进入休眠
+ * @brief Comprehensive Example 
+ * @n This module can be controlled by hardware serial or software serial. Pin IRQ should be connected to D6 in this experiment. 
+ * @n Experiment Phenomenon：when finger press down, the blue LED blinks quickly 3 times, which means it enters fingerprint 
+ * @n comparison mode.
+ * @n                        The yellow LED blinks quickly 3 times for entering fingerprint registration mode
+ * @n                        The red LED blinks quickly 3 times for entering fingerprint deletion mode, and delet this fringerprint
+ * @n                        Enter sleep mode when idle for 5 seconds 
  * @copyright  Copyright (c) 2010 DFRobot Co.Ltd (http://www.dfrobot.com)
  * @licence     The MIT License (MIT)
  * @author [Eddard](Eddard.liu@dfrobot.com)
@@ -17,10 +18,10 @@
 
 #include <DFRobot_ID809.h>
 
-#define COLLECT_NUMBER 3  //指纹采样次数，可设置1-3
-#define WAKEUP         6  //唤醒引脚
+#define COLLECT_NUMBER 3  //Fingerprint sampling times, can be set to 1-3
+#define WAKEUP         6  //wake up pin 
 
-/*如果使用UNO或NANO，则使用软串口*/
+/*Use software serial when using UNO or NANO*/
 #if ((defined ARDUINO_AVR_UNO) || (defined ARDUINO_AVR_NANO))
     #include <SoftwareSerial.h>
     SoftwareSerial Serial1(2, 3);  //RX, TX
