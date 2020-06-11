@@ -46,7 +46,7 @@ void setup(){
     Return true or false
     */
   while(fingerprint.isConnected() == false){
-    Serial.println("Communication with device failed, please check wire connection");
+    Serial.println("Communication with device failed, please check connection");
     /*获取错误码信息*/
     desc = fingerprint.getErrorDescription();
     Serial.println(desc);
