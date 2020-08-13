@@ -5,14 +5,6 @@ Taking ID809 high-performance processor and semiconductor fingerprint sensor as 
 The product supports UART communication. When working with Arduino library, it can easily realize functions like  fingerprint registration, fingerprint deletion, etc.<br>
 
 This fingerprint sensor comes with round breathing LEDs and has a simple structure, small size, and delicate appearance. The sensor offers fast recognition speed and high security. What’s more, it supports 360-degree arbitrary angle recognition and deep self-learning function, high performance and low power consumption.
-<br>
-<img src="./image/SEN0318-image.jpg">
-<br>
-
-* Arduino UNO
-<br>
-<img src="./image/SEN0318-CONNECT.jpg">
-<br>
 
    
 ## Table of Contents
@@ -84,7 +76,7 @@ To use this library, first download the library file, paste it into the \Arduino
    * @param 1(ON) or 0(OFF)
    * @return 0(succeed) or ERR_ID809
    */
-  uint8_t setAutoLearn(uint8_t autoLearn);
+  uint8_t setSelfLearn(uint8_t selfLearn);
   
   /**
    * @brief Read module ID
@@ -114,7 +106,7 @@ To use this library, first download the library file, paste it into the \Arduino
    * @brief Read the module self-learning function status 
    * @return Status：1(ON), 0(OFF) or ERR_ID809
    */
-  uint8_t getAutoLearn();
+  uint8_t getSelfLearn();
    
   /**
    * @brief Read device number 
@@ -234,10 +226,10 @@ To use this library, first download the library file, paste it into the \Arduino
   uint8_t loadFingerprint(uint8_t ID, uint8_t RamBufferID);
   
   /**
-   * @brief Enter sleep status
+   * @brief Enter sleep mode
    * @return 0(succeed) or ERR_ID809
    */
-  uint8_t enterStandbyState();
+  uint8_t enterSleepState();
   
   /**
    * @brief Get error information

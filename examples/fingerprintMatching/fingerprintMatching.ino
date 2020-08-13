@@ -1,8 +1,8 @@
 /*!
  * @file fingerprintMatching.ino
- * @brief 采集指纹并与指纹库中指纹做对比
- * @n 实验现象：采集指纹图像并与指纹库中的指纹做对比，
-                对比成功亮绿色灯并打印ID号，对比失败返回0
+ * @brief Gather fingerprint and compare it with fingerprints in fingerprint library
+ * @n Experiment Phenomenon：capture fingerprint image and compare it with all fingerprints in the fingerprint library
+                If matched successfully, light up green LED and print ID number. Return 0 when failed.
  * @copyright  Copyright (c) 2010 DFRobot Co.Ltd (http://www.dfrobot.com)
  * @licence     The MIT License (MIT)
  * @author [Eddard](Eddard.liu@dfrobot.com)
@@ -13,33 +13,23 @@
 */
 #include <DFRobot_ID809.h>
 
-/*如果使用UNO或NANO，则使用软串口*/
-#if ((defined ARDUINO_AVR_UNO) || (defined ARDUINO_AVR_NANO))
-    #include <SoftwareSerial.h>
-    SoftwareSerial Serial1(2, 3);  //RX, TX
-    #define FPSerial Serial1
-#else
-    #define FPSerial Serial1
-#endif
-
-DFRobot_ID809 fingerprint;
+DFRobot_ID809_IIC fingerprint(&Wire,0x10);
+//DFRobot_ID809_UART fingerprint(115200);
 String desc;
 
 void setup(){
-  /*初始化打印串口*/
+  /*Init print serial port*/
   Serial.begin(9600);
-  /*初始化FPSerial*/
-  FPSerial.begin(115200);
-  /*将FPSerial作为指纹模块的通讯串口*/
-  fingerprint.begin(FPSerial);
-  /*等待Serial打开*/
+  /*Take FPSerial as communication serial port of the fingerprint module*/
+  fingerprint.begin();
+  /*Wait for Serial to open*/
   while(!Serial);
-  /*测试设备与主控是否能正常通讯,
-    返回true or false
+  /*Test whether the device can properly communicate with mainboard
+   Return true or false
     */
   while(fingerprint.isConnected() == false){
-    Serial.println("与设备通讯失败，请检查接线");
-    /*获取错误码信息*/
+    Serial.println("Communication with device failed, please check connection");
+    /*Get error code information*/
     desc = fingerprint.getErrorDescription();
     Serial.println(desc);
     delay(1000);
@@ -49,55 +39,55 @@ void setup(){
 uint8_t ret;
 
 void loop(){
-  /*设置指纹灯环模式、颜色和闪烁次数，
-    可设置参数如下：
-    参数1:<LEDMode>
+  /*Set fingerprint LED ring mode, color, and number of blinks
+    Can be set as follows:
+    Parameter 1:<LEDMode>
     eBreathing   eFastBlink   eKeepsOn    eNormalClose
     eFadeIn      eFadeOut     eSlowBlink   
-    参数2:<LEDColor>
+    Parameter 2:<LEDColor>
     eLEDGreen  eLEDRed      eLEDYellow   eLEDBlue
     eLEDCyan   eLEDMagenta  eLEDWhite
-    参数3:<呼吸、闪烁次数> 0表示一直呼吸、闪烁，
-    该参数仅在eBreathing、eFastBlink、eSlowBlink模式下有效
+    Parameter 3:<number of blinks> 0 represents blinking all the time
+    This parameter will only be valid in mode eBreathing, eFastBlink, eSlowBlink
    */
   fingerprint.ctrlLED(/*LEDMode = */fingerprint.eBreathing, /*LEDColor = */fingerprint.eLEDBlue, /*blinkCount = */0);
-  Serial.println("请按下手指");
-  /*采集指纹图像，超过10S没按下手指则采集超时
-    如果获取成功返回0，否则返回ERR_ID809
+  Serial.println("Please press down your finger");
+  /*Capture fingerprint image, 10s idle timeout 
+    If succeed return 0, otherwise return ERR_ID809
    */
   if((fingerprint.collectionFingerprint(/*timeout=*/10)) != ERR_ID809){
-    /*设置指纹灯环为黄色快闪3次*/
+    /*Set fingerprint LED ring to quick blink in yellow 3 times*/
     fingerprint.ctrlLED(/*LEDMode = */fingerprint.eFastBlink, /*LEDColor = */fingerprint.eLEDYellow, /*blinkCount = */3);
-    Serial.println("采集成功");
+    Serial.println("Capturing succeeds");
   }else{
-    Serial.println("采集失败");
-    /*获取错误码信息*/
+    Serial.println("Capturing fails");
+    /*Get error code information*/
     desc = fingerprint.getErrorDescription();
     Serial.println(desc);
   }
-  Serial.println("请松开手指");
-  /*等待手指松开
-    检测到手指返回1，否则返回0
+  Serial.println("Please release your finger");
+  /*Wait for finger to release
+    Return 1 when finger is detected, otherwise return 0 
    */
   while(fingerprint.detectFinger());
   
-  /*将采集到的指纹与指纹库中的所有指纹对比，
-    成功返回指纹编号(1-80)，失败返回0
+  /*Compare the captured fingerprint with all the fingerprints in the fingerprint library 
+    Return fingerprint ID(1-80) if succeed, return 0 when failed 
    */
   ret = fingerprint.search();
-  /*将采集到的指纹与指定编号指纹对比
-    成功返回指纹编号(1-80)，失败返回0
+  /*Compare the captured fingerprint with a fingerprint of specific ID 
+    Return fingerprint ID(1-80) if succeed, return 0 when failed 
    */
   //ret = fingerprint.verify(/*Fingerprint ID = */1);  
   if(ret != 0){
-    /*设置指纹灯环为绿色常亮*/
+    /*Set fingerprint LED ring to always ON in green */
     fingerprint.ctrlLED(/*LEDMode = */fingerprint.eKeepsOn, /*LEDColor = */fingerprint.eLEDGreen, /*blinkCount = */0);
-    Serial.print("匹配成功,ID=");
+    Serial.print("Matching succeeds,ID=");
     Serial.println(ret);
   }else{
-    /*设置指纹灯环为红色常亮*/
+    /*Set fingerprint LED ring to always ON in red*/
     fingerprint.ctrlLED(/*LEDMode = */fingerprint.eKeepsOn, /*LEDColor = */fingerprint.eLEDRed, /*blinkCount = */0);
-    Serial.println("匹配失败");
+    Serial.println("Matching fails");
   }
   Serial.println("-----------------------------");
   delay(1000);

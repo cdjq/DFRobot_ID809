@@ -1,11 +1,10 @@
 /*!
  * @file fingerprintRegistration.ino
- * @brief 采集指纹并保存
- * @n 该模块可以使用硬串口或软串口控制
- * @n 实验现象：自动获取空白ID，然后采集三次指纹，采集时
- * @n           设置灯环为蓝色呼吸灯，采集成功黄色灯快闪
- * @n           3次，最后将指纹保存到获取到的未注册的编
- * @n           号中，绿色灯亮1S然后熄灭
+ * @brief Fingerprint Acquisition and Saving 
+ * @n This module can be controlled by hardware serial or software serial 
+ * @n Experiment Phenomenon：auto retrieve unregistered ID, collect fingerprint 3 times.  
+ * @n           In collecting, set LED ring to breathing lighting in blue, and then to quick blink in yellow 3 times when completed 
+ * @n           At last, save the fingerprint in an unregistered ID, the green LED lights up for 1s and turns off. 
  * @copyright  Copyright (c) 2010 DFRobot Co.Ltd (http://www.dfrobot.com)
  * @licence     The MIT License (MIT)
  * @author [Eddard](Eddard.liu@dfrobot.com)
@@ -17,35 +16,25 @@
 
 #include <DFRobot_ID809.h>
 
-#define COLLECT_NUMBER 3  //指纹采样次数，可设置1-3
+#define COLLECT_NUMBER 3  //Fingerprint sampling times, can be set to 2-3
 
-/*如果使用UNO或NANO，则使用软串口*/
-#if ((defined ARDUINO_AVR_UNO) || (defined ARDUINO_AVR_NANO))
-    #include <SoftwareSerial.h>
-    SoftwareSerial Serial1(2, 3);  //RX, TX
-    #define FPSerial Serial1
-#else
-    #define FPSerial Serial1
-#endif
-
-DFRobot_ID809 fingerprint;
+DFRobot_ID809_IIC fingerprint(&Wire,0x10);
+//DFRobot_ID809_UART fingerprint(115200);
 String desc;
 
 void setup(){
-  /*初始化打印串口*/
+  /*Init print serial port */
   Serial.begin(9600);
-  /*初始化FPSerial*/
-  FPSerial.begin(115200);
-  /*将FPSerial作为指纹模块的通讯串口*/
-  fingerprint.begin(FPSerial);
-  /*等待Serial打开*/
+  /*Take FPSerial as communication port of the module*/
+  fingerprint.begin();
+  /*Wait for Serial to open*/
   while(!Serial);
-  /*测试设备与主控是否能正常通讯,
-    返回true or false
+  /*Test whether the device can communicate properly with mainboard 
+    Return true or false
     */
   while(fingerprint.isConnected() == false){
-    Serial.println("与设备通讯失败，请检查接线");
-    /*获取错误码信息*/
+    Serial.println("Communication with device failed, please check connection");
+    /*Get error code information*/
     desc = fingerprint.getErrorDescription();
     Serial.println(desc);
     delay(1000);
@@ -55,74 +44,74 @@ void setup(){
 uint8_t ID,i,ret;
 
 void loop(){
-  /*获取一个未注册编号，用来保存指纹
-    获取成功返回ID号，
-    获取失败返回ERR_ID809
+  /*Get an unregistered ID for saving fingerprint 
+    Return ID when succeeded 
+    Return ERR_ID809 if failed 
    */
   if((ID = fingerprint.getEmptyID()) == ERR_ID809){
     while(1){
-      /*获取错误码信息*/
+      /*Get error code information*/
       desc = fingerprint.getErrorDescription();
       Serial.println(desc);
       delay(1000);
     }
   }
-  Serial.print("未注册编号,ID=");
+  Serial.print("unresistered ID,ID=");
   Serial.println(ID);
-  i = 0;   //采样计数清零
-  /*指纹采样三次*/
+  i = 0;   //Clear sampling times 
+  /*Fingerprint sampling 3 times*/
   while(i < COLLECT_NUMBER){
-    /*设置指纹灯环模式、颜色和闪烁次数，
-      可设置参数如下：
-      参数1:<LEDMode>
+    /*Set fingerprint LED ring mode, color, and number of blinks 
+      Can be set as follows: 
+      Parameter 1:<LEDMode>
       eBreathing   eFastBlink   eKeepsOn    eNormalClose
       eFadeIn      eFadeOut     eSlowBlink   
-      参数2:<LEDColor>
+      Parameter 2:<LEDColor>
       eLEDGreen  eLEDRed      eLEDYellow   eLEDBlue
       eLEDCyan   eLEDMagenta  eLEDWhite
-      参数3:<呼吸、闪烁次数> 0表示一直呼吸、闪烁，
-      该参数仅在eBreathing、eFastBlink、eSlowBlink模式下有效
+      Parameter 3:<Number of blinks> 0 represents blinking all the time 
+      This parameter will only be valid in mode eBreathing, eFastBlink, eSlowBlink
      */
     fingerprint.ctrlLED(/*LEDMode = */fingerprint.eBreathing, /*LEDColor = */fingerprint.eLEDBlue, /*blinkCount = */0);
-    Serial.print("正在进行第");
+    Serial.print("The fingerprint sampling of the");
     Serial.print(i+1);
-    Serial.println("次指纹采样");
-    Serial.println("请按下手指");
-    /*采集指纹图像，超过10S没按下手指则采集超时
-      如果获取成功返回0，否则返回ERR_ID809
+    Serial.println("(th) is being taken");
+    Serial.println("Please press down your finger");
+    /*Capture fingerprint image, 10s idle timeout 
+      IF succeeded, return 0, otherwise, return ERR_ID809
      */
     if((fingerprint.collectionFingerprint(/*timeout = */10)) != ERR_ID809){
-      /*设置指纹灯环为黄色快闪3次*/
+      /*Set fingerprint LED ring to quick blink in yellow 3 times */
       fingerprint.ctrlLED(/*LEDMode = */fingerprint.eFastBlink, /*LEDColor = */fingerprint.eLEDYellow, /*blinkCount = */3);
-      Serial.println("采集成功");
-      i++;   //采样计数+1
+      Serial.println("Sampling succeeds");
+      i++;   //Sampling times +1
     }else{
-      Serial.println("采集失败");
-      /*获取错误码信息*/
+      Serial.println("Sampling failed");
+      /*Get error code information*/
       desc = fingerprint.getErrorDescription();
       Serial.println(desc);
     }
-    Serial.println("请松开手指");
-    /*等待手指松开
-      检测到手指返回1，否则返回0
+    Serial.println("Please release your finger");
+    /*Wait for finger to release 
+      Return 1 when finger is detected, otherwise return 0 
      */
     while(fingerprint.detectFinger());
   }
   
-  /*将指纹信息保存到一个未注册的编号中*/
+  /*Save fingerprint in an unregistered ID */
   if(fingerprint.storeFingerprint(/*Empty ID = */ID) != ERR_ID809){
-    Serial.print("保存成功，ID=");
+    Serial.print("Saving succeed，ID=");
     Serial.println(ID);
     Serial.println("-----------------------------");
-    /*设置指纹灯环为绿色常亮*/
+    /*Set fingerprint LED ring to always ON in green */
     fingerprint.ctrlLED(/*LEDMode = */fingerprint.eKeepsOn, /*LEDColor = */fingerprint.eLEDGreen, /*blinkCount = */0);
     delay(1000);
-    /*关闭指纹灯环*/
+    /*Turn off fingerprint LED ring */
     fingerprint.ctrlLED(/*LEDMode = */fingerprint.eNormalClose, /*LEDColor = */fingerprint.eLEDBlue, /*blinkCount = */0);
     delay(1000);
   }else{
-    Serial.println("保存失败");
-    /*获取错误码信息*/
+    Serial.println("Saving failed");
+    /*Get error code information*/
     desc = fingerprint.getErrorDescription();
     Serial.println(desc);
   }
