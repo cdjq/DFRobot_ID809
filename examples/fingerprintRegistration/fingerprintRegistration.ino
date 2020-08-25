@@ -20,7 +20,7 @@
 
 DFRobot_ID809_IIC fingerprint(&Wire,0x10);
 //DFRobot_ID809_UART fingerprint(115200);
-String desc;
+//String desc;
 
 void setup(){
   /*Init print serial port */
@@ -35,8 +35,8 @@ void setup(){
   while(fingerprint.isConnected() == false){
     Serial.println("Communication with device failed, please check connection");
     /*Get error code information*/
-    desc = fingerprint.getErrorDescription();
-    Serial.println(desc);
+    //desc = fingerprint.getErrorDescription();
+    //Serial.println(desc);
     delay(1000);
   }
 }
@@ -51,8 +51,8 @@ void loop(){
   if((ID = fingerprint.getEmptyID()) == ERR_ID809){
     while(1){
       /*Get error code information*/
-      desc = fingerprint.getErrorDescription();
-      Serial.println(desc);
+      //desc = fingerprint.getErrorDescription();
+      //Serial.println(desc);
       delay(1000);
     }
   }
@@ -88,8 +88,8 @@ void loop(){
     }else{
       Serial.println("Sampling failed");
       /*Get error code information*/
-      desc = fingerprint.getErrorDescription();
-      Serial.println(desc);
+      //desc = fingerprint.getErrorDescription();
+      //Serial.println(desc);
     }
     Serial.println("Please release your finger");
     /*Wait for finger to release 
@@ -112,7 +112,7 @@ void loop(){
   }else{
     Serial.println("Saving failed");
     /*Get error code information*/
-    desc = fingerprint.getErrorDescription();
-    Serial.println(desc);
+    //desc = fingerprint.getErrorDescription();
+    //Serial.println(desc);
   }
 }

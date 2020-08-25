@@ -17,22 +17,27 @@
 
 
 Stream *dbg=NULL;
-
+#if ((defined ARDUINO_AVR_UNO) || (defined ARDUINO_AVR_NANO) ||(defined NRF5))
+    SoftwareSerial Serial1(2, 3);  //RX, TX
+    //#define FPSerial Serial1
+#else
+    //#define FPSerial Serial1   
+#endif
 DFRobot_ID809::DFRobot_ID809()
 {
 
 }
-
 bool DFRobot_ID809::isConnected()
 {
-  unsigned long time1;
+
   pCmdPacketHeader_t header = pack(CMD_TYPE, CMD_TEST_CONNECTION, NULL, 0);
   sendPacket(header);
-  time1 = millis();
   free(header);
+  if(ISIIC == true)
+    delay(50);
+
   uint8_t ret = responsePayload(buf);
-  time1 = millis() - time1;
-  Serial.println(time1);
+ 
   LDBG("ret=");
   LDBG(ret);
   if(ret == ERR_SUCCESS) {
@@ -133,6 +138,8 @@ String DFRobot_ID809::getDeviceInfo()
   pCmdPacketHeader_t header = pack(CMD_TYPE, CMD_DEVICE_INFO, NULL, 0);
   sendPacket(header);
   free(header);
+  if(ISIIC == true)
+    delay(50);
   result = responsePayload(buf);
   LDBG("result=");
   LDBG(result);
@@ -164,6 +171,8 @@ uint8_t DFRobot_ID809::setModuleSN(const char* SN)
   pCmdPacketHeader_t header = pack(CMD_TYPE, CMD_SET_MODULE_SN, data, 2);
   sendPacket(header);
   free(header);
+  if(ISIIC == true)
+   delay(100);
   uint8_t ret = responsePayload(buf);
   LDBG("ret=");
   LDBG(ret);
@@ -173,6 +182,8 @@ uint8_t DFRobot_ID809::setModuleSN(const char* SN)
   header = pack(DATA_TYPE, CMD_SET_MODULE_SN, SN, MODULE_SN_SIZE);
   sendPacket(header);
   free(header);
+  if(ISIIC == true)
+   delay(240);
   ret = responsePayload(buf);
   LDBG("ret=");
   LDBG(ret);
@@ -187,6 +198,8 @@ String DFRobot_ID809::getModuleSN()
   char *data;
   pCmdPacketHeader_t header = pack(CMD_TYPE, CMD_GET_MODULE_SN, NULL, 0);
   sendPacket(header);
+  if(ISIIC == true)
+  delay(100);
   free(header);
   uint8_t result = responsePayload(buf);
   LDBG("result=");
@@ -211,7 +224,7 @@ String DFRobot_ID809::getModuleSN()
 
   return ret;
 }
-
+/*wang*/
 uint8_t DFRobot_ID809::ctrlLED(eLEDMode_t mode,eLEDColor_t color,uint8_t blinkCount)
 {
   char data[4] = {0};
@@ -221,17 +234,21 @@ uint8_t DFRobot_ID809::ctrlLED(eLEDMode_t mode,eLEDColor_t color,uint8_t blinkCo
   pCmdPacketHeader_t header = pack(CMD_TYPE, CMD_SLED_CTRL, data, 4);
   sendPacket(header);
   free(header);
+  if(ISIIC == true)
+  delay(50);
   uint8_t ret = responsePayload(buf);
   LDBG("ret=");
   LDBG(ret);
   return ret;
 }
-
+/*wang*/
 uint8_t DFRobot_ID809::detectFinger()
 {
   pCmdPacketHeader_t header = pack(CMD_TYPE, CMD_FINGER_DETECT, NULL, 0);
   sendPacket(header);
   free(header);
+  if(ISIIC == true)
+  delay(240);
   uint8_t ret = responsePayload(buf);
   LDBG("ret=");
   LDBG(ret);
@@ -240,7 +257,7 @@ uint8_t DFRobot_ID809::detectFinger()
   }
   return ret;
 }
-
+/*wang*/
 uint8_t DFRobot_ID809::getEmptyID()
 {
   char data[4] = {0};
@@ -249,6 +266,8 @@ uint8_t DFRobot_ID809::getEmptyID()
   pCmdPacketHeader_t header = pack(CMD_TYPE, CMD_GET_EMPTY_ID, data, 4);
   sendPacket(header);
   free(header);
+  if(ISIIC == true)
+  delay(100);
   uint8_t ret = responsePayload(buf);
   LDBG("ret=");
   LDBG(ret);
@@ -265,6 +284,8 @@ uint8_t DFRobot_ID809::getStatusID(uint8_t ID)
   pCmdPacketHeader_t header = pack(CMD_TYPE, CMD_GET_STATUS, data, 2);
   sendPacket(header);
   free(header);
+  if(ISIIC == true)
+   delay(50);
   uint8_t ret = responsePayload(buf);
   LDBG("ret=");
   LDBG(ret);
@@ -282,6 +303,8 @@ uint8_t DFRobot_ID809::getEnrollCount()
   pCmdPacketHeader_t header = pack(CMD_TYPE, CMD_GET_ENROLL_COUNT, data, 4);
   sendPacket(header);
   free(header);
+  if(ISIIC == true)
+  delay(80);
   uint8_t ret = responsePayload(buf);
   LDBG("ret=");
   LDBG(ret);
@@ -298,7 +321,11 @@ uint8_t DFRobot_ID809::getEnrolledIDList(uint8_t* list)
   uint8_t i = 0;
   pCmdPacketHeader_t header = pack(CMD_TYPE, CMD_GET_ENROLLED_ID_LIST, NULL, 0);
   sendPacket(header);
+  
   free(header);
+  if(ISIIC == true)
+     delay(120     );
+ 
   uint8_t ret = responsePayload(buf);
   LDBG("ret=");
   LDBG(ret);
@@ -323,7 +350,7 @@ uint8_t DFRobot_ID809::getEnrolledIDList(uint8_t* list)
   free(data);
   return ret;
 }
-
+/*wang*/
 uint8_t DFRobot_ID809::storeFingerprint(uint8_t ID)
 {
   char data[4] = {0};
@@ -337,14 +364,17 @@ uint8_t DFRobot_ID809::storeFingerprint(uint8_t ID)
   data[0] = ID;
   pCmdPacketHeader_t header = pack(CMD_TYPE, CMD_STORE_CHAR, data, 4);
   sendPacket(header);
+  
   free(header);
+  if(ISIIC == true)
+  delay(360);
   ret = responsePayload(buf);
   LDBG("ret=");
   LDBG(ret);
   return ret;
 
 }
-
+/*wang*/
 uint8_t DFRobot_ID809::delFingerprint(uint8_t ID)
 {
   char data[4] = {0};
@@ -357,12 +387,14 @@ uint8_t DFRobot_ID809::delFingerprint(uint8_t ID)
   pCmdPacketHeader_t header = pack(CMD_TYPE, CMD_DEL_CHAR, data, 4);
   sendPacket(header);
   free(header);
+  if(ISIIC == true)
+  delay(360);
   uint8_t ret = responsePayload(buf);
   LDBG("ret=");
   LDBG(ret);
   return ret;
 }
-
+/*wang*/
 uint8_t DFRobot_ID809::search()
 {
   char data[6] = {0};
@@ -372,6 +404,8 @@ uint8_t DFRobot_ID809::search()
   pCmdPacketHeader_t header = pack(CMD_TYPE, CMD_SEARCH, data, 6);
   sendPacket(header);
   free(header);
+  if(ISIIC == true)
+  delay(360);
   uint8_t ret = responsePayload(buf);
   LDBG("ret=");
   LDBG(ret);
@@ -410,6 +444,8 @@ uint8_t DFRobot_ID809::match(uint8_t RamBufferID0, uint8_t RamBufferID1)
   pCmdPacketHeader_t header = pack(CMD_TYPE, CMD_MATCH, data, 4);
   sendPacket(header);
   free(header);
+  if(ISIIC == true)
+  delay(100);
   uint8_t ret = responsePayload(buf);
   LDBG("ret=");
   LDBG(ret);
@@ -427,8 +463,12 @@ uint8_t DFRobot_ID809::getBrokenQuantity()
   data[0] = 1;
   data[2] = FINGERPRINT_CAPACITY;
   pCmdPacketHeader_t header = pack(CMD_TYPE, CMD_GET_BROKEN_ID, data, 4);
+  
   sendPacket(header);
+  
   free(header);
+  if(ISIIC == true)
+  delay(50);
   uint8_t ret = responsePayload(buf);
   LDBG("ret=");
   LDBG(ret);
@@ -474,17 +514,21 @@ uint8_t DFRobot_ID809::enterSleepState()
   pCmdPacketHeader_t header = pack(CMD_TYPE, CMD_ENTER_STANDBY_STATE, NULL, 0);
   sendPacket(header);
   free(header);
+  if(ISIIC == true)
+  delay(50);
   uint8_t ret = responsePayload(buf);
   LDBG("ret=");
   LDBG(ret);
   return ret;
 }
-
+/*wang*/
 uint8_t DFRobot_ID809::setParam(uint8_t* data)
 {
   pCmdPacketHeader_t header = pack(CMD_TYPE, CMD_SET_PARAM, (const char *)data, 5);
   sendPacket(header);
   free(header);
+  if(ISIIC == true)
+  delay(240);
   uint8_t ret = responsePayload(buf);
   LDBG("ret=");
   LDBG(ret);
@@ -496,6 +540,8 @@ uint8_t DFRobot_ID809::getParam(uint8_t* data)
   pCmdPacketHeader_t header = pack(CMD_TYPE, CMD_GET_PARAM, (const char *)data, 1);
   sendPacket(header);
   free(header);
+  if(ISIIC == true)
+  delay(50);
   uint8_t ret = responsePayload(buf);
   LDBG("ret=");
   LDBG(ret);
@@ -510,6 +556,8 @@ uint8_t DFRobot_ID809::getImage()
   pCmdPacketHeader_t header = pack(CMD_TYPE, CMD_GET_IMAGE, NULL, 0);
   sendPacket(header);
   free(header);
+  if(ISIIC == true)
+  delay(360);
   uint8_t ret = responsePayload(buf);
   LDBG("ret=");
   LDBG(ret);
@@ -535,6 +583,7 @@ uint8_t DFRobot_ID809::collectionFingerprint(uint16_t timeout)   //Collect finge
       return ERR_ID809;
     }
   }
+
   ret = getImage();
   LDBG("ret=");
   LDBG(ret);
@@ -550,20 +599,23 @@ uint8_t DFRobot_ID809::collectionFingerprint(uint16_t timeout)   //Collect finge
   _number++;
   return ret;
 }
-
+/*wang*/
 uint8_t DFRobot_ID809::generate(uint8_t RamBufferID)
 {
   char data[2] = {0};
   data[0] = RamBufferID;
   pCmdPacketHeader_t header = pack(CMD_TYPE, CMD_GENERATE, (const char *)data, 2);
+  
   sendPacket(header);
   free(header);
+  if(ISIIC == true)
+  delay(360);
   uint8_t ret = responsePayload(buf);
   LDBG("ret=");
   LDBG(ret);
   return ret;
 }
-
+/*wang*/
 uint8_t DFRobot_ID809::merge()
 {
   char data[3] = {0};
@@ -571,6 +623,8 @@ uint8_t DFRobot_ID809::merge()
   pCmdPacketHeader_t header = pack(CMD_TYPE, CMD_MERGE, data, 3);
   sendPacket(header);
   free(header);
+  if(ISIIC == true)
+  delay(360);
   uint8_t ret = responsePayload(buf);
   LDBG("ret=");
   LDBG(ret);
@@ -750,7 +804,7 @@ uint16_t DFRobot_ID809::getRcmCKS(pRcmPacketHeader_t packet)
   cks += packet->LEN>>8;
   cks += packet->RET&0xFF;
   cks += packet->RET>>8;
-  if(packet->LEN > 0) {
+  if(packet->LEN > 0) {  
     uint8_t *p = packet->payload;
     for(uint8_t i = 0; i < packet->LEN-2; i++) {
       cks += p[i];
@@ -803,6 +857,7 @@ DFRobot_ID809_IIC::DFRobot_ID809_IIC(TwoWire *pWire, uint8_t address)
 {
   _deviceAddr = address;
   _pWire = pWire;
+  ISIIC = true;
 }
 
 bool DFRobot_ID809_IIC::begin()
@@ -818,33 +873,23 @@ void DFRobot_ID809_IIC::sendPacket(pCmdPacketHeader_t pBuf)
   }
   uint8_t * _pBuf = (uint8_t *)pBuf;
   
-  
-  
-  //Serial.print("1");
   _pWire->requestFrom(_deviceAddr, 1);
-  //Serial.print("2");
+
   if(0xee != _pWire->read()) {
     _pWire->requestFrom(_deviceAddr, 1);
-    //Serial.print("4");
+
     while(0xee != _pWire->read()){_pWire->requestFrom(_deviceAddr, 1);
-	//Serial.println(_pWire->read());
+
 	}
     _pWire->requestFrom(_deviceAddr, 1);
   }
- 
+  
   _pWire->beginTransmission(_deviceAddr);
-  //Serial.print("tx ->");
   for(uint16_t i = 0; i < _PacketSize; i++) {
-   
    _pWire->write(_pBuf[i]);
-    //Serial.print(_pBuf[i],HEX);
-    //Serial.print(" ");
-	
   }
   _pWire->endTransmission();
-  //Serial.println();
-  
-  delay(400);
+  //delay(340);
 }
 
 size_t DFRobot_ID809_IIC::readN(void* pBuf, size_t size)
@@ -882,24 +927,21 @@ size_t DFRobot_ID809_IIC::readN(void* pBuf, size_t size)
 DFRobot_ID809_UART::DFRobot_ID809_UART(uint32_t baudRate)
 {
   _baudRate = baudRate;
+  ISIIC = false;
+
+  
+
 }
 
 
 bool DFRobot_ID809_UART::begin()
 {  
-  #if ((defined ARDUINO_AVR_UNO) || (defined ARDUINO_AVR_NANO) ||(defined NRF5))
-      SoftwareSerial Serial1(2, 3);  //RX, TX
-      //#define FPSerial Serial1
-  #else
-      //#define FPSerial Serial1   
-  #endif
-
   #ifdef  ESP_PLATFORM 
     Serial1.begin(_baudRate,P0,P1);
   #else
     Serial1.begin(_baudRate);
   #endif
-
+  
   s = &Serial1;
   if(s == NULL) {
     return false;
@@ -910,7 +952,9 @@ bool DFRobot_ID809_UART::begin()
 
 void DFRobot_ID809_UART::sendPacket(pCmdPacketHeader_t header)
 {
+  
   s->write((uint8_t *)header,_PacketSize);
+
 }
 
 
@@ -919,9 +963,11 @@ size_t DFRobot_ID809_UART::readN(void* buffer, size_t len)
   size_t offset = 0,left = len;
   uint8_t *buf = (uint8_t*)buffer;
   long long curr = millis();
+  
   while(left) {
     if(s->available()) {
       buf[offset++] = s->read();
+	  //Serial.println(buf[offset++]);
       left--;
 
     }

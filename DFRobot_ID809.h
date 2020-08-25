@@ -26,6 +26,9 @@
 #else
   #include <SoftwareSerial.h>
 #endif
+
+
+  
 //Open this macro to see the detailed running process of the program 
 
 //#define ENABLE_DBG
@@ -467,7 +470,7 @@ protected:
    * @return CKS
    */
   uint16_t getRcmCKS(pRcmPacketHeader_t packet);
-
+  bool ISIIC = true;
 protected:
     /**
    * @brief Send data 
@@ -506,6 +509,7 @@ private:
 };
 
 class DFRobot_ID809_UART : public DFRobot_ID809{
+
 public: 
   DFRobot_ID809_UART(uint32_t baudRate);
   bool begin();
@@ -513,8 +517,10 @@ protected:
    void sendPacket(pCmdPacketHeader_t header);
    size_t readN(void* buf_, size_t len);
 private:
+
   Stream *s;
   uint32_t _baudRate;
+  
 };
 
 #endif
