@@ -491,7 +491,7 @@ private:
   pCmdPacketHeader_t  sendHeader;
   pRcmPacketHeader_t  recHeader;
   
-   static const sErrorDescription_t /*PROGMEM*/ errorDescriptionsTable[26]PROGMEM;   //Error information list 
+   static const sErrorDescription_t /*PROGMEM*/ errorDescriptionsTable[26];   //Error information list 
   uint8_t _number = 0;       //Fingerprint acquisistion times 
   eError_t _error;           //Error code 
 };

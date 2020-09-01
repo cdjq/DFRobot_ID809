@@ -17,11 +17,9 @@
 
 
 Stream *dbg=NULL;
+
 #if ((defined ARDUINO_AVR_UNO) || (defined ARDUINO_AVR_NANO) ||(defined NRF5))
     SoftwareSerial Serial1(2, 3);  //RX, TX
-    //#define FPSerial Serial1
-#else
-    //#define FPSerial Serial1   
 #endif
 DFRobot_ID809::DFRobot_ID809()
 {
@@ -31,13 +29,15 @@ bool DFRobot_ID809::isConnected()
 {
 
   pCmdPacketHeader_t header = pack(CMD_TYPE, CMD_TEST_CONNECTION, NULL, 0);
+
   sendPacket(header);
+
   free(header);
   if(ISIIC == true)
     delay(50);
 
   uint8_t ret = responsePayload(buf);
- 
+
   LDBG("ret=");
   LDBG(ret);
   if(ret == ERR_SUCCESS) {
@@ -672,6 +672,7 @@ uint8_t DFRobot_ID809::responsePayload(void* buf)
   uint8_t ch,ret;
   int16_t type;
   type = readPrefix(&header);
+
   if(type == 1) {
     LDBG("--recv timeout---");
     _error = eErrorRecvTimeout;
@@ -693,6 +694,7 @@ uint8_t DFRobot_ID809::responsePayload(void* buf)
       while(1);
     }
   }
+
   memcpy(packet, &header, 10);
   dataCount = readN(packet->payload, dataLen);
   cks = packet->payload[dataLen-2]+(packet->payload[dataLen-1]<<8);
@@ -727,12 +729,15 @@ uint16_t DFRobot_ID809::readPrefix( pRcmPacketHeader_t header )
     RECV_HEADER_OK
   } eRecvHeaderState;
   eRecvHeaderState state = RECV_HEADER_INIT;
+
   long curr = millis();
+
   while(state != RECV_HEADER_OK) {  //Can judge the received command packet and command data packet prefix at the same time
     if(readN(&ch, 1) != 1) {
       ret = 1;
       return ret;
     }
+
     if((ch == 0xAA) && (state == RECV_HEADER_INIT)) {
       state = RECV_HEADER_AA;
       continue;
@@ -872,7 +877,8 @@ void DFRobot_ID809_IIC::sendPacket(pCmdPacketHeader_t pBuf)
     LDBG("pBuf ERROR!! : null pointer");
   }
   uint8_t * _pBuf = (uint8_t *)pBuf;
-  
+  #if defined(ESP8266) 
+  #else
   _pWire->requestFrom(_deviceAddr, 1);
 
   if(0xee != _pWire->read()) {
@@ -883,13 +889,13 @@ void DFRobot_ID809_IIC::sendPacket(pCmdPacketHeader_t pBuf)
 	}
     _pWire->requestFrom(_deviceAddr, 1);
   }
-  
+  #endif
   _pWire->beginTransmission(_deviceAddr);
+  
   for(uint16_t i = 0; i < _PacketSize; i++) {
    _pWire->write(_pBuf[i]);
   }
   _pWire->endTransmission();
-  //delay(340);
 }
 
 size_t DFRobot_ID809_IIC::readN(void* pBuf, size_t size)
@@ -898,6 +904,7 @@ size_t DFRobot_ID809_IIC::readN(void* pBuf, size_t size)
   if(pBuf == NULL) {
     LDBG("pBuf ERROR!! : null pointer");
   }
+  
   uint8_t * _pBuf = (uint8_t *)pBuf;
   _pWire->beginTransmission(_deviceAddr);
 
@@ -905,8 +912,6 @@ size_t DFRobot_ID809_IIC::readN(void* pBuf, size_t size)
     _pWire->requestFrom(_deviceAddr, 32);
     for(uint16_t i = 0; i < 32; i++) {
       _pBuf[i + len - size] = _pWire->read();
-	  
-	  
     }
     size -= 32;
   }
@@ -914,10 +919,10 @@ size_t DFRobot_ID809_IIC::readN(void* pBuf, size_t size)
   _pWire->requestFrom(_deviceAddr, (uint8_t) size);
   for(uint16_t i = 0; i < size; i++) {
     _pBuf[i + len - size] = _pWire->read();
-	//Serial.print(_pBuf[i + len - size]);
+	//Serial.print(_pBuf[i + len - size],HEX);
 	//Serial.print(" ");
   }
-  //Serial.println(" ");
+
   if( _pWire->endTransmission() != 0) {
     return 0;
   }
@@ -928,20 +933,27 @@ DFRobot_ID809_UART::DFRobot_ID809_UART(uint32_t baudRate)
 {
   _baudRate = baudRate;
   ISIIC = false;
-
   
-
 }
 
 
 bool DFRobot_ID809_UART::begin()
 {  
   #ifdef  ESP_PLATFORM 
+    if(ARDUINO_VARIANT == "firebeetle32")
+    {
+      #define P0 33
+	  #define P1 32
+      Serial1.begin(_baudRate);
+    }
+	else{
     Serial1.begin(_baudRate,P0,P1);
+	}
   #else
+	  
     Serial1.begin(_baudRate);
+    //Serial1.pins(2,5);
   #endif
-  
   s = &Serial1;
   if(s == NULL) {
     return false;
@@ -962,18 +974,17 @@ size_t DFRobot_ID809_UART::readN(void* buffer, size_t len)
 {
   size_t offset = 0,left = len;
   uint8_t *buf = (uint8_t*)buffer;
+
   long long curr = millis();
-  
   while(left) {
     if(s->available()) {
       buf[offset++] = s->read();
-	  //Serial.println(buf[offset++]);
-      left--;
-
+      Serial.println(buf[offset++]);
+	  left--;
     }
-
+    
     if(millis() - curr > 5000) {
-      LDBG("----------!!!!!!!!!recv timeout----------");
+     LDBG("----------!!!!!!!!!recv timeout----------");
       break;
     }
   }
