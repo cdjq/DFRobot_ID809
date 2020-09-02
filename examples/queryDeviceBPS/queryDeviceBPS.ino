@@ -13,9 +13,10 @@
 #include <DFRobot_ID809.h>
 
 uint32_t ID809_BPS[5] = {9600, 19200, 38400, 57600, 115200};
-uint8_t i = 0;
 
 void setup(){
+  uint8_t flag = 1;
+  uint8_t i = 0;
   /*Init print serial port */
   Serial.begin(9600);
   /*Test module baud rate */
@@ -25,9 +26,10 @@ void setup(){
     DFRobot_ID809_UART fingerprint(ID809_BPS[i]);
     /*Take FPSerial as communication port of fingerprint module */
     fingerprint.begin();
+    if(fingerprint.isConnected() == false) flag = 0;
     i++;
     if(i > 4) i = 0;
-  }while(fingerprint.isConnected() == false);
+  }while(flag);
   Serial.println(" ");
 }
 
