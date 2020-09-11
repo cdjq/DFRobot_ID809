@@ -75,6 +75,7 @@ uint8_t DFRobot_ID809::setDuplicationCheck(uint8_t duplicationCheck)
 
 uint8_t DFRobot_ID809::setBaudrate(eDeviceBaudrate_t baudrate)
 {
+  if(ISIIC == true) return ERR_ID809;
   uint8_t data[5] = {0};
   data[0] = 3;
   data[1] = baudrate;
