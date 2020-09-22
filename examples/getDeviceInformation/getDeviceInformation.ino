@@ -13,7 +13,7 @@
 
 #include <DFRobot_ID809.h>
 
-DFRobot_ID809_IIC fingerprint(&Wire,0x10);
+DFRobot_ID809_IIC fingerprint;
 //DFRobot_ID809_UART fingerprint(115200);
 //String desc;
 
@@ -99,7 +99,7 @@ void loop(){
     Serial.print(",");
   }
   
-  Serial.print("\n Number of broken fingerprints:");
+  Serial.print("\nNumber of broken fingerprints:");
   /*Get the number of broken fingerprints */
   Serial.println(fingerprint.getBrokenQuantity());
   /*Get the ID of the first broken fingerprint*/

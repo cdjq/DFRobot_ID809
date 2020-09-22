@@ -21,7 +21,7 @@
 #define COLLECT_NUMBER 3  //Fingerprint sampling times, can be set to 1-3
 #define WAKEUP         1  //wake up pin 
 
-DFRobot_ID809_IIC fingerprint(&Wire,0x10);
+DFRobot_ID809_IIC fingerprint;
 //DFRobot_ID809_UART fingerprint(115200);
 //String desc;
 
@@ -172,7 +172,7 @@ void fingerprintRegistration(){
   
   /*Save fingerprint information into an unregistered ID*/
   if(fingerprint.storeFingerprint(/*Empty ID = */ID) != ERR_ID809){
-    Serial.print("Saving succeed，ID=");
+    Serial.print("Saving succeed,ID=");
     Serial.println(ID);
     /*Set fingerprint LED ring to always ON in green*/
     fingerprint.ctrlLED(/*LEDMode = */fingerprint.eKeepsOn, /*LEDColor = */fingerprint.eLEDGreen, /*blinkCount = */0);

@@ -498,7 +498,7 @@ private:
 
 class DFRobot_ID809_IIC : public DFRobot_ID809{
 public: 
-  DFRobot_ID809_IIC(TwoWire *pWire = &Wire, uint8_t address = 0x10);
+  DFRobot_ID809_IIC(TwoWire *pWire = &Wire, uint8_t address = 0x1F);
    bool begin();
 protected:
    void sendPacket(pCmdPacketHeader_t pBuf);
