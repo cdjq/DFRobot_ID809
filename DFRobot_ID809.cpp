@@ -166,7 +166,7 @@ uint8_t DFRobot_ID809::setModuleSN(const char* SN)
   char data[2];
   data[0] = MODULE_SN_SIZE;
   if(strlen(SN) > MODULE_SN_SIZE) {
-    LDBG("SN号超过15位");
+    LDBG("The serial number exceeds 15 characters");
     return ERR_ID809;
   }
   pCmdPacketHeader_t header = pack(CMD_TYPE, CMD_SET_MODULE_SN, data, 2);
