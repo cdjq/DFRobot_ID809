@@ -267,7 +267,11 @@ public:
    * @return Status：1(ON), 0(OFF) or ERR_ID809
    */
   uint8_t getSelfLearn();
-   
+  uint8_t getTemplate(uint16_t id,uint8_t * temp);
+  uint8_t downLoadTemplate(uint16_t id,uint8_t * temp);
+  uint8_t getFingerImage(uint8_t *image);
+  uint8_t downLoadImage(uint16_t id,uint8_t * temp);
+  uint8_t receiveImageData(uint8_t *image);
   /**
    * @brief Read device number 
    * @return Device number
@@ -483,7 +487,7 @@ protected:
    * @param Length of data to be received 
    * @return Actual received data length 
    */
-  virtual size_t readN(void* buf_, size_t len) =0;
+  virtual uint16_t readN(void* buf_, uint16_t len) =0;
   
   uint16_t _PacketSize = 0;  //The length of the packet to be sent
 private:
@@ -493,6 +497,7 @@ private:
   
    static const sErrorDescription_t /*PROGMEM*/ errorDescriptionsTable[26];   //Error information list 
   uint8_t _number = 0;       //Fingerprint acquisistion times 
+  uint8_t _state = 0;        //Collect fingerprint state
   eError_t _error;           //Error code 
 };
 
@@ -502,7 +507,7 @@ public:
    bool begin();
 protected:
    void sendPacket(pCmdPacketHeader_t pBuf);
-   size_t readN(void* pBuf, size_t size);
+   uint16_t readN(void* pBuf, uint16_t size);
 private:
   TwoWire *_pWire;
   uint8_t _deviceAddr;
@@ -515,7 +520,7 @@ public:
   bool begin();
 protected:
    void sendPacket(pCmdPacketHeader_t header);
-   size_t readN(void* buf_, size_t len);
+   uint16_t readN(void* buf_, uint16_t len);
 private:
 
   Stream *s;
