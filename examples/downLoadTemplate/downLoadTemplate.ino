@@ -1,7 +1,6 @@
 /*!
  * @file downLoadTemplate.ino
- * @brief Get fingerprint module information 
- * @n Experiment Phenomenon：serial print module ID, security level, baud rate, etc. 
+ * @brief 下载模板数据到传感器中,并指定对应编号
  * @copyright  Copyright (c) 2010 DFRobot Co.Ltd (http://www.dfrobot.com)
  * @licence     The MIT License (MIT)
  * @author [Eddard](Eddard.liu@dfrobot.com)
@@ -11,7 +10,7 @@
  * @url https://github.com/cdjq/DFRobot_ID809
 */
 #include <DFRobot_ID809.h>
-
+//模板数据
 uint8_t temp[1008]={
 0xFB, 0x4C, 0x58, 0x29, 0x76, 0x02, 0xF2, 0x3F, 
 0xC8, 0x9B, 0xE8, 0xCC, 0xBC, 0x09, 0xED, 0xD7, 
@@ -163,12 +162,9 @@ void setup(){
   }
   
   
-  fingerprint.downLoadTemplate(5,temp);
+  fingerprint.downLoadTemplate(/*id = */5,temp);
   Serial.println("over");
 }
-
-uint8_t enrollCount;   //Number of registered users 
-
 void loop(){
 
 

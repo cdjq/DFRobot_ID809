@@ -1,7 +1,6 @@
 /*!
  * @file getImage.ino
- * @brief Get fingerprint module information 
- * @n Experiment Phenomenon：serial print module ID, security level, baud rate, etc. 
+ * @brief 获取指纹图像,并保存为bmp图像饭在flash中
  * @copyright  Copyright (c) 2010 DFRobot Co.Ltd (http://www.dfrobot.com)
  * @licence     The MIT License (MIT)
  * @author [Eddard](Eddard.liu@dfrobot.com)
@@ -12,6 +11,8 @@
 */
 
 #include <DFRobot_ID809.h>
+#include "FS.h"
+#include "FFat.h"
 //指纹图像 bmp 头文件数据 
 uint8_t bmpHeader[1078] = {0x42, 0x4d, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 00, 0x36, 0x04, 0x00, 0x00, 0x28, 0x00, 
 0x00, 0x00, 0xa0, 0x00, 0x00, 0x00, 0xa0, 0x00, 0x00, 00, 0x01, 0x00, 0x08, 0x00, 0x00, 0x00, 
@@ -80,17 +81,22 @@ uint8_t bmpHeader[1078] = {0x42, 0x4d, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 0xf2, 0x00, 0xf3, 0xf3, 0xf3, 0x00, 0xf4, 0xf4, 0xf4, 00, 0xf5, 0xf5, 0xf5, 0x00, 0xf6, 0xf6, 
 0xf6, 0x00, 0xf7, 0xf7, 0xf7, 0x00, 0xf8, 0xf8, 0xf8, 00, 0xf9, 0xf9, 0xf9, 0x00, 0xfa, 0xfa, 
 0xfa, 0x00, 0xfb, 0xfb, 0xfb, 0x00, 0xfc, 0xfc, 0xfc, 00, 0xfd, 0xfd, 0xfd, 0x00, 0xfe, 0xfe, 
-0xfe, 0x00, 0xff, 0xff, 0xff, 0x00  }
+0xfe, 0x00, 0xff, 0xff, 0xff, 0x00  };
+
+#define FORMAT_FFAT true
 //DFRobot_ID809_IIC fingerprint;
 DFRobot_ID809_UART fingerprint(115200);
+
 //String desc;
 //160*160 256灰度数据
 uint8_t data[160*160]={0};
 void setup(){
   /*Init print serial port */
   Serial.begin(9600);
+
   /*Take FPSerial as communication port of the module*/
   fingerprint.begin();
+  while(!Serial);
   /*Wait for Serial to open*/
   /*Test whether device can communicate properly with mainboard 
     Return true or false
@@ -106,6 +112,19 @@ void setup(){
   Serial.println("start");
   fingerprint.getFingerImage(data);
   Serial.println("over");
+  File file = FFat.open("/fingerImage.txt", FILE_WRITE);
+  if(!file){
+        Serial.println("- failed to open file for writing");
+  } else {
+    Serial.print("- writing" );
+    file.write(bmpHeader, 1078);
+    for(uint8_t i = 0;i<50;i++){
+      file.write(data + i*512, 512);
+      }
+    file.close();
+  }
+
+
 }
  
 
