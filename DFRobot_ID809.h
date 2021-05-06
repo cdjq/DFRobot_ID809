@@ -474,6 +474,7 @@ protected:
    * @return CKS
    */
   uint16_t getRcmCKS(pRcmPacketHeader_t packet);
+  uint8_t store(uint8_t ID);
   bool ISIIC = true;
 protected:
     /**

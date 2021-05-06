@@ -264,7 +264,9 @@ uint8_t DFRobot_ID809::downLoadTemplate(uint16_t id,uint8_t * temp){
     ret = buf[0];
   }
   free(tempData);
-  return storeFingerprint(id);
+  
+
+  return store(id);
 
 
 }
@@ -358,7 +360,7 @@ uint8_t DFRobot_ID809::downLoadImage(uint16_t id,uint8_t * temp)
   if(ret != ERR_SUCCESS) {
    // return ERR_ID809;
   }
-  return storeFingerprint(id);
+  return store(id);
 
 }
 
@@ -533,14 +535,13 @@ uint8_t DFRobot_ID809::getEnrolledIDList(uint8_t* list)
 uint8_t DFRobot_ID809::storeFingerprint(uint8_t ID)
 {
   char data[4] = {0};
-  uint8_t ret;
- // uint8_t ret = merge();
+  uint8_t ret = merge();
   LDBG("ret=");
   LDBG(ret);
- // if(ret != ERR_SUCCESS) {
- //   return ERR_ID809;
- // }
-  //_number = 0;
+  if(ret != ERR_SUCCESS) {
+    return ERR_ID809;
+  }
+  _number = 0;
   data[0] = ID;
   pCmdPacketHeader_t header = pack(CMD_TYPE, CMD_STORE_CHAR, data, 4);
   sendPacket(header);
@@ -552,7 +553,22 @@ uint8_t DFRobot_ID809::storeFingerprint(uint8_t ID)
   return ret;
 
 }
+uint8_t DFRobot_ID809::store(uint8_t ID){
 
+
+  char data[4] = {0};
+  uint8_t ret;
+  LDBG("ret=");
+  LDBG(ret);
+  data[0] = ID;
+  pCmdPacketHeader_t header = pack(CMD_TYPE, CMD_STORE_CHAR, data, 4);
+  sendPacket(header);
+  free(header);
+  ret = responsePayload(buf);
+  LDBG("ret=");
+  LDBG(ret);
+  return ret;
+}
 uint8_t DFRobot_ID809::delFingerprint(uint8_t ID)
 {
   char data[4] = {0};
