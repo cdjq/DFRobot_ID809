@@ -1,16 +1,15 @@
-/*!
- * @file downLoadTemplate.ino
- * @brief 下载模板数据到传感器中,并指定对应编号
- * @copyright  Copyright (c) 2010 DFRobot Co.Ltd (http://www.dfrobot.com)
- * @licence     The MIT License (MIT)
- * @author [Eddard](Eddard.liu@dfrobot.com)
- * @version  V1.0
- * @date  2020-03-19
- * @get from https://www.dfrobot.com
- * @url https://github.com/cdjq/DFRobot_ID809
-*/
+ //使用该实例首先需要保证对应ID中有指纹模板
+//现象：
+//setup
+//1.将指纹模板读取出来，保存到数组中
+//2.删除该指纹，并查询是否删除成功
+//loop
+//3.按下手指采集指纹，用该指纹模板数据进行验证
+//4.将该模板保存到ID中
+
 #include <DFRobot_ID809.h>
-//模板数据
+
+
 uint8_t temp[1008]={
 0xFB, 0x4C, 0x58, 0x29, 0x76, 0x02, 0xF2, 0x3F, 
 0xC8, 0x9B, 0xE8, 0xCC, 0xBC, 0x09, 0xED, 0xD7, 
@@ -139,7 +138,6 @@ uint8_t temp[1008]={
 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 
 };
-
 /*Use software serial when using UNO or NANO*/
 #if ((defined ARDUINO_AVR_UNO) || (defined ARDUINO_AVR_NANO))
     #include <SoftwareSerial.h>
@@ -149,14 +147,16 @@ uint8_t temp[1008]={
     #define FPSerial Serial1
 #endif
 DFRobot_ID809 fingerprint;
-//DFRobot_ID809_UART fingerprint(115200);
-//String desc;
-uint8_t data[1024]={0};
 void setup(){
   /*Init print serial port */
   Serial.begin(9600);
   /*Init FPSerial*/
-  FPSerial.begin(115200);
+  #ifdef  ESP_PLATFORM 
+    FPSerial.begin(115200, SERIAL_8N1, /*rx =*/D3, /*tx =*/D4);
+  /*Take FPSerial as communication port of fingerprint module */
+  #else
+    FPSerial.begin(115200);
+  #endif
   /*Take FPSerial as communication port of fingerprint module */
   fingerprint.begin(FPSerial);
   /*Wait for Serial to open*/
@@ -170,13 +170,36 @@ void setup(){
     //Serial.println(desc);
     delay(1000);
   }
-  
-  
-  fingerprint.downLoadTemplate(/*id = */5,temp);
-  Serial.println("over");
 }
+
 void loop(){
-
-
+  //设置采集灯环
+  fingerprint.ctrlLED(/*LEDMode = */fingerprint.eBreathing, /*LEDColor = */fingerprint.eLEDBlue, /*blinkCount = */0);
+  Serial.println("请按下手指");
+  /*采集指纹图像，关闭采集超时功能
+    如果获取成功返回0，否则返回ERR_ID809
+   */
+  if((fingerprint.collectionFingerprint(/*timeout=*/0,0)) != ERR_ID809){
+    /*设置指纹灯环为黄色快闪3次*/
+    fingerprint.ctrlLED(/*LEDMode = */fingerprint.eFastBlink, /*LEDColor = */fingerprint.eLEDYellow, /*blinkCount = */3);
+    Serial.println("采集成功");
+    Serial.println("请松开手指");
+    /*等待手指松开
+      检测到手指返回1，否则返回0
+     */
+    while(fingerprint.detectFinger());
+    //将采集的指纹与模板对比
+    //a(data);   //需传入模板数据
+    //模板数据放到rambuffer3,并与采集到的数据作对比
+   if(!fingerprint.contrastTemplate(/*TEMP = */temp)){
+    Serial.println("对比成功,模板与手指匹配");
+   } else{
+    Serial.println("对比失败,模板手指不匹配");
+   
+   }
+  }else{
+    Serial.println("采集失败");
+  }
+  Serial.println("-----------------------------");
   delay(1000);
 }

@@ -12,24 +12,33 @@
 */
 #include <DFRobot_ID809.h>
 
+/*Use software serial when using UNO or NANO*/
+#if ((defined ARDUINO_AVR_UNO) || (defined ARDUINO_AVR_NANO))
+    #include <SoftwareSerial.h>
+    SoftwareSerial Serial1(2, 3);  //RX, TX
+    #define FPSerial Serial1
+#else
+    #define FPSerial Serial1
+#endif
+
+DFRobot_ID809 fingerprint;
+
 uint32_t ID809_BPS[5] = {9600, 19200, 38400, 57600, 115200};
+uint8_t i = 0;
 
 void setup(){
-  uint8_t flag = 1;
-  uint8_t i = 0;
   /*Init print serial port */
   Serial.begin(9600);
   /*Test module baud rate */
   do{
     /*Init FPSerial*/
     Serial.print(".");
-    DFRobot_ID809_UART fingerprint(ID809_BPS[i]);
+    FPSerial.begin(ID809_BPS[i]);
     /*Take FPSerial as communication port of fingerprint module */
-    fingerprint.begin();
-    if(fingerprint.isConnected() == false) flag = 0;
+    fingerprint.begin(FPSerial);
     i++;
     if(i > 4) i = 0;
-  }while(flag);
+  }while(fingerprint.isConnected() == false);
   Serial.println(" ");
 }
 

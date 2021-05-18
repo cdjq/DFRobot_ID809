@@ -13,15 +13,25 @@
 */
 #include <DFRobot_ID809.h>
 
-//DFRobot_ID809_IIC fingerprint;
-DFRobot_ID809_UART fingerprint(115200);
+/*Use software serial when using UNO or NANO */
+#if ((defined ARDUINO_AVR_UNO) || (defined ARDUINO_AVR_NANO))
+    #include <SoftwareSerial.h>
+    SoftwareSerial Serial1(2, 3);  //RX, TX
+    #define FPSerial Serial1
+#else
+    #define FPSerial Serial1
+#endif
+
+DFRobot_ID809 fingerprint;
 //String desc;
 
 void setup(){
   /*Init print serial port*/
   Serial.begin(9600);
-  /*Take FPSerial as communication serial port of the fingerprint module*/
-  fingerprint.begin();
+  /*Init FPSerial*/
+  FPSerial.begin(115200);
+  /*Take FPSerial as communication serial port of the fingerprint module */
+  fingerprint.begin(FPSerial);
   /*Wait for Serial to open*/
   while(!Serial);
   /*Test whether the device can properly communicate with mainboard
@@ -51,7 +61,7 @@ void loop(){
     This parameter will only be valid in mode eBreathing, eFastBlink, eSlowBlink
    */
   fingerprint.ctrlLED(/*LEDMode = */fingerprint.eBreathing, /*LEDColor = */fingerprint.eLEDBlue, /*blinkCount = */0);
-  /*Capture fingerprint image, 10s idle timeout 
+  /*Capture fingerprint image, 10s idle timeout, if timeout=0,Disable  the collection timeout function
     If succeed return 0, otherwise return ERR_ID809
    */
   if((fingerprint.collectionFingerprint(/*timeout=*/10)) != ERR_ID809){

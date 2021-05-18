@@ -14,15 +14,30 @@
 //位图颜色深度为256灰度位图,像素为160x160
 uint8_t temp[160*160]={0};
 
-//DFRobot_ID809_IIC fingerprint;
-DFRobot_ID809_UART fingerprint(115200);
+/*Use software serial when using UNO or NANO*/
+#if ((defined ARDUINO_AVR_UNO) || (defined ARDUINO_AVR_NANO))
+    #include <SoftwareSerial.h>
+    SoftwareSerial Serial1(2, 3);  //RX, TX
+    #define FPSerial Serial1
+#else
+    #define FPSerial Serial1
+#endif
+DFRobot_ID809 fingerprint;
+
 //String desc;
 uint8_t data[1024]={0};
 void setup(){
   /*Init print serial port */
   Serial.begin(9600);
-  /*Take FPSerial as communication port of the module*/
-  fingerprint.begin();
+  /*Init FPSerial*/
+  #ifdef  ESP_PLATFORM 
+    FPSerial.begin(115200, SERIAL_8N1, /*rx =*/D3, /*tx =*/D4);
+  /*Take FPSerial as communication port of fingerprint module */
+  #else
+    FPSerial.begin(115200);
+  #endif
+  /*Take FPSerial as communication port of fingerprint module */
+  fingerprint.begin(FPSerial);
   /*Wait for Serial to open*/
   /*Test whether device can communicate properly with mainboard 
     Return true or false

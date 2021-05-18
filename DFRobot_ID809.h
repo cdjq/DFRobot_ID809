@@ -21,14 +21,9 @@
 #include "WProgram.h"
 #endif
 #include <Wire.h>
+
 #include <stdint.h>
-#if ((defined ESP_PLATFORM) || (defined ARDUINO_SAM_ZERO))
-#else
-  #include <SoftwareSerial.h>
-#endif
 
-
-  
 //Open this macro to see the detailed running process of the program 
 
 //#define ENABLE_DBG
@@ -145,10 +140,7 @@ public:
     e19200bps,
     e38400bps,
     e57600bps,
-    e115200bps,
-    e230400bps,
-    e460800bps,
-    e921600bps
+    e115200bps
   }eDeviceBaudrate_t;
   
   typedef enum{
@@ -189,13 +181,14 @@ public:
 
 public:
   DFRobot_ID809();
+  ~DFRobot_ID809();
   
   /**
    * @brief Init communication port
    * @param Software serial or hardware serial 
    * @return true or false
    */
-  virtual bool begin(void) = 0;
+  bool begin(Stream &s_);
   
   /**
    * @brief Test whether the module connection is ok
@@ -272,6 +265,8 @@ public:
   uint8_t getFingerImage(uint8_t *image);
   uint8_t downLoadImage(uint16_t id,uint8_t * temp);
   uint8_t receiveImageData(uint8_t *image);
+  uint8_t getQuarterFingerImage(uint8_t *image);
+  uint8_t contrastTemplate(uint8_t *temp);
   /**
    * @brief Read device number 
    * @return Device number
@@ -334,7 +329,7 @@ public:
    * @brief Fingerprint acquisition 
    * @return 0(succeed) or ERR_ID809
    */
-  uint8_t collectionFingerprint(uint16_t timeout);
+  uint8_t collectionFingerprint(uint16_t timeout,int ramNumber = -1);
   
   /**
    * @brief Save fingerprint 
@@ -402,7 +397,7 @@ public:
    */
   String getErrorDescription();
   
- // bool setDbgSerial(Stream &s_){dbg = &s_; return true;}
+  bool setDbgSerial(Stream &s_){dbg = &s_; return true;}
 protected:
    /**
    * @brief Set parameter 
@@ -448,6 +443,20 @@ protected:
   pCmdPacketHeader_t pack(uint8_t type, uint16_t cmd, const char *payload, uint16_t len);
   
  /**
+   * @brief Send data 
+   * @param Data frame
+   */
+  void sendPacket(pCmdPacketHeader_t header);
+  
+ /**
+   * @brief Read byte 
+   * @param Pointer for saving data 
+   * @param Length of data to be received 
+   * @return Actual received data length 
+   */
+  size_t readN(void* buf_, size_t len);
+  
+ /**
    * @brief Read frame header 
    * @param Frame header struct of response packet
    * @return Response packet type：RCM_TYPE,DATA_TYPE or 1(reading timeout)
@@ -476,58 +485,21 @@ protected:
   uint16_t getRcmCKS(pRcmPacketHeader_t packet);
   uint8_t store(uint8_t ID);
   bool ISIIC = true;
-protected:
-    /**
-   * @brief Send data 
-   * @param Data frame
-   */
-  virtual void sendPacket(pCmdPacketHeader_t header) =0;
-  /**
-   * @brief Read byte 
-   * @param Pointer for saving data 
-   * @param Length of data to be received 
-   * @return Actual received data length 
-   */
-  virtual uint16_t readN(void* buf_, uint16_t len) =0;
   
-  uint16_t _PacketSize = 0;  //The length of the packet to be sent
 private:
+  Stream *s;
   uint8_t buf[20];     //For saving response packet data 
   pCmdPacketHeader_t  sendHeader;
   pRcmPacketHeader_t  recHeader;
   
-   static const sErrorDescription_t /*PROGMEM*/ errorDescriptionsTable[26];   //Error information list 
+  static const sErrorDescription_t /*PROGMEM*/ errorDescriptionsTable[26];   //Error information list 
+  
   uint8_t _number = 0;       //Fingerprint acquisistion times 
   uint8_t _state = 0;        //Collect fingerprint state
   eError_t _error;           //Error code 
-};
-
-class DFRobot_ID809_IIC : public DFRobot_ID809{
-public: 
-  DFRobot_ID809_IIC(TwoWire *pWire = &Wire, uint8_t address = 0x1F);
-   bool begin();
-protected:
-   void sendPacket(pCmdPacketHeader_t pBuf);
-   uint16_t readN(void* pBuf, uint16_t size);
-private:
-  TwoWire *_pWire;
-  uint8_t _deviceAddr;
-};
-
-class DFRobot_ID809_UART : public DFRobot_ID809{
-
-public: 
-  DFRobot_ID809_UART(uint32_t baudRate);
-  bool begin();
-protected:
-   void sendPacket(pCmdPacketHeader_t header);
-   uint16_t readN(void* buf_, uint16_t len);
-private:
-
-  Stream *s;
-  uint32_t _baudRate;
-  
+  uint16_t _PacketSize = 0;  //Data packet length to be sent 
 };
 
 #endif
+
 

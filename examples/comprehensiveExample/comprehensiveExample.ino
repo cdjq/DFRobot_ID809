@@ -21,15 +21,25 @@
 #define COLLECT_NUMBER 3  //Fingerprint sampling times, can be set to 1-3
 #define IRQ         6  //IRQ pin 
 
-DFRobot_ID809_IIC fingerprint;
-//DFRobot_ID809_UART fingerprint(115200);
+/*Use software serial when using UNO or NANO*/
+#if ((defined ARDUINO_AVR_UNO) || (defined ARDUINO_AVR_NANO))
+    #include <SoftwareSerial.h>
+    SoftwareSerial Serial1(2, 3);  //RX, TX
+    #define FPSerial Serial1
+#else
+    #define FPSerial Serial1
+#endif
+
+DFRobot_ID809 fingerprint;
 //String desc;
 
 void setup(){
-  /*Init print serial port*/
+  /*Init print serial*/
   Serial.begin(9600);
-  /*Take FPSerial as communication serial port of the fingerprint module*/
-  fingerprint.begin();
+  /*Init FPSerial*/
+  FPSerial.begin(115200);
+  /*Take FPSerial as communication serial of fingerprint module*/
+  fingerprint.begin(FPSerial);
   /*Wait for Serial to open*/
   while(!Serial);
   /*Test whether the device can properly communicate with mainboard
@@ -48,7 +58,7 @@ void setup(){
 void loop(){
   if(digitalRead(IRQ)){
     uint16_t i = 0;
-    /*Capture fingerprint image, 5s idle timeout 
+    /*Capture fingerprint image, 5s idle timeout, if timeout=0,Disable  the collection timeout function
       Return 0 if succeed, otherwise return ERR_ID809
      */
     if((fingerprint.collectionFingerprint(/*timeout=*/5)) != ERR_ID809){
@@ -172,7 +182,7 @@ void fingerprintRegistration(){
   
   /*Save fingerprint information into an unregistered ID*/
   if(fingerprint.storeFingerprint(/*Empty ID = */ID) != ERR_ID809){
-    Serial.print("Saving succeed,ID=");
+    Serial.print("Saving succeed，ID=");
     Serial.println(ID);
     /*Set fingerprint LED ring to always ON in green*/
     fingerprint.ctrlLED(/*LEDMode = */fingerprint.eKeepsOn, /*LEDColor = */fingerprint.eLEDGreen, /*blinkCount = */0);
