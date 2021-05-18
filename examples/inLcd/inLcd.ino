@@ -76,7 +76,6 @@ void loop(){
    //采集图像
    fingerprint.getQuarterFingerImage(data);
    //显示图像
-   //
    for(uint16_t i = 0; i < 6400 ;i++){
      uint8_t a = i % 80;
      uint8_t b = i / 80;

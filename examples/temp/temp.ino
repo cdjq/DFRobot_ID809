@@ -9,7 +9,7 @@
 
 #include <DFRobot_ID809.h>
 
-
+//模板数据
 uint8_t temp[1008]={
 0xFB, 0x4C, 0x58, 0x29, 0x76, 0x02, 0xF2, 0x3F, 
 0xC8, 0x9B, 0xE8, 0xCC, 0xBC, 0x09, 0xED, 0xD7, 
@@ -178,6 +178,7 @@ void loop(){
   Serial.println("请按下手指");
   /*采集指纹图像，关闭采集超时功能
     如果获取成功返回0，否则返回ERR_ID809
+     采集一次指纹模板数据,然后储存到rambuffer0
    */
   if((fingerprint.collectionFingerprint(/*timeout=*/0,0)) != ERR_ID809){
     /*设置指纹灯环为黄色快闪3次*/
@@ -188,9 +189,7 @@ void loop(){
       检测到手指返回1，否则返回0
      */
     while(fingerprint.detectFinger());
-    //将采集的指纹与模板对比
-    //a(data);   //需传入模板数据
-    //模板数据放到rambuffer3,并与采集到的数据作对比
+    //模板数据放到rambuffer3,并与之前采集到的存到rambuffer0的模板数据作对比
    if(!fingerprint.contrastTemplate(/*TEMP = */temp)){
     Serial.println("对比成功,模板与手指匹配");
    } else{

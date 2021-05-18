@@ -113,9 +113,8 @@ void loop(){
   //设置采集灯环
   fingerprint.ctrlLED(/*LEDMode = */fingerprint.eBreathing, /*LEDColor = */fingerprint.eLEDBlue, /*blinkCount = */0);
   Serial.println("请按下手指");
-   //采集图像
+   //采集图像,这是1/4大小图像
   fingerprint.getQuarterFingerImage(data);
-   //保存图像
   if (!SD.begin(/*csPin = */3, /*type = */TYPE_NONBOARD_SD_MOUDLE)) {
     SerialUSB.println("initialization failed!");
     while(1);
