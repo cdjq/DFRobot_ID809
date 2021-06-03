@@ -1,21 +1,5 @@
-/*!
- * @file getImage.ino
- * @brief 获取指纹图像,并保存为bmp图像饭在flash中
- * @copyright  Copyright (c) 2010 DFRobot Co.Ltd (http://www.dfrobot.com)
- * @licence     The MIT License (MIT)
- * @author [Eddard](Eddard.liu@dfrobot.com)
- * @version  V1.0
- * @date  2020-03-19
- * @get from https://www.dfrobot.com
- * @url https://github.com/cdjq/DFRobot_ID809
-*/
-
-#include <DFRobot_ID809.h>
-#include "FS.h"
-#include "FFat.h"
-//指纹图像 bmp 头文件数据 
 uint8_t bmpHeader[1078] = {0x42, 0x4d, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 00, 0x36, 0x04, 0x00, 0x00, 0x28, 0x00, 
-0x00, 0x00, 0xa0, 0x00, 0x00, 0x00, 0xa0, 0x00, 0x00, 00, 0x01, 0x00, 0x08, 0x00, 0x00, 0x00, 
+0x00, 0x00, 0x50, 0x00, 0x00, 0x00, 0x50, 0x00, 0x00, 00, 0x01, 0x00, 0x08, 0x00, 0x00, 0x00, 
 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 00, 0x01, 0x01, 0x01, 0x00, 0x02, 0x02, 
 0x02, 0x00, 0x03, 0x03, 0x03, 0x00, 0x04, 0x04, 0x04, 00, 0x05, 0x05, 0x05, 0x00, 0x06, 0x06, 
@@ -82,60 +66,3 @@ uint8_t bmpHeader[1078] = {0x42, 0x4d, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 0xf6, 0x00, 0xf7, 0xf7, 0xf7, 0x00, 0xf8, 0xf8, 0xf8, 00, 0xf9, 0xf9, 0xf9, 0x00, 0xfa, 0xfa, 
 0xfa, 0x00, 0xfb, 0xfb, 0xfb, 0x00, 0xfc, 0xfc, 0xfc, 00, 0xfd, 0xfd, 0xfd, 0x00, 0xfe, 0xfe, 
 0xfe, 0x00, 0xff, 0xff, 0xff, 0x00  };
-
-/*Use software serial when using UNO or NANO*/
-#if ((defined ARDUINO_AVR_UNO) || (defined ARDUINO_AVR_NANO))
-    #include <SoftwareSerial.h>
-    SoftwareSerial Serial1(2, 3);  //RX, TX
-    #define FPSerial Serial1
-#else
-    #define FPSerial Serial1
-#endif
-DFRobot_ID809 fingerprint;
-//DFRobot_ID809_UART fingerprint(115200);
-//String desc;
-uint8_t data[1024]={0};
-void setup(){
-  /*Init print serial port */
-  Serial.begin(9600);
-  /*Init FPSerial*/
-  FPSerial.begin(115200);
-  /*Take FPSerial as communication port of fingerprint module */
-  fingerprint.begin(FPSerial);
-  while(!Serial);
-  /*Wait for Serial to open*/
-  /*Test whether device can communicate properly with mainboard 
-    Return true or false
-    */
-  while(fingerprint.isConnected() == false){
-    Serial.println("Communication with device failed, please check connection");
-    /*Get error code information */
-    //desc = fingerprint.getErrorDescription();
-    //Serial.println(desc);
-    delay(1000);
-  }
-  
-  Serial.println("start");
-  fingerprint.getFingerImage(data);
-  Serial.println("over");
-  File file = FFat.open("/fingerImage.txt", FILE_WRITE);
-  if(!file){
-        Serial.println("- failed to open file for writing");
-  } else {
-    Serial.print("- writing" );
-    file.write(bmpHeader, 1078);
-    for(uint8_t i = 0;i<50;i++){
-      file.write(data + i*512, 512);
-      }
-    file.close();
-  }
-
-
-}
- 
-
-void loop(){
-
-
-  delay(1000);
-}
