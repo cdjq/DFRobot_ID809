@@ -1,6 +1,7 @@
 /*!
  *@file getQuarterFingerImage.ino
  *@brief 将采集到的指纹图像储存与SD卡中,并显示在屏幕上,可选择获取1/4图像或者全图像
+ *该示例需要搭配屏幕和SD卡模块使用，并且使用高性能主控
  *@copyright   Copyright (c) 2010 DFRobot Co.Ltd (http://www.dfrobot.com)
  *@licence     The MIT License (MIT)
  *@author [fengli](li.feng@dfrobot.com)
@@ -19,8 +20,8 @@
 #define TFT_DC  7
 #define TFT_CS  5
 #define TFT_RST 6
-/*ESP32 and ESP8266*/
-#elif defined(ESP32) || defined(ESP8266)
+/*ESP32*/
+#elif defined ESP32
 #define TFT_DC  D7
 #define TFT_CS  D8
 #define TFT_RST D9
@@ -32,26 +33,19 @@
 #endif
 
 
+/*请根据使用的主控选择串口*/
+#define FPSerial Serial1
 
-
-
-/*Use software serial when using UNO or NANO*/
-#if ((defined ARDUINO_AVR_UNO) || (defined ARDUINO_AVR_NANO))
-    #include <SoftwareSerial.h>
-    SoftwareSerial Serial1(2, 3);  //RX, TX
-    #define FPSerial Serial1
-#else
-    #define FPSerial Serial1
-#endif
 DFRobot_ILI9341_240x320_HW_SPI  screen(/*dc=*/TFT_DC,/*cs=*/TFT_CS,/*rst=*/TFT_RST);
 DFRobot_ID809 fingerprint;
 //String desc;
+File myFile;
 
 #define QUARTER
 #ifdef  QUARTER
-uint8_t data[6400];   //四分之一
+uint8_t data[6400];   //四分之一图像
 #else
-uint8_t data[25600];  //全图像
+uint8_t data[25600];  //全尺寸图像
 #endif
 
 void setup(){
@@ -74,30 +68,28 @@ void setup(){
     //Serial.println(desc);
     delay(1000);
   }
+  /*请根据主控对于的SD库初始化SD卡模块*/
+  while(!SD.begin(/*csPin = */3, /*type = */TYPE_NONBOARD_SD_MOUDLE)) {
+    SerialUSB.println("initialization failed!");
+    delay(1000);
+  }
 }
-File myFile;
+
 void loop(){
-  //设置采集灯环
+  /*设置指纹LED环为蓝色呼吸灯*/
   fingerprint.ctrlLED(/*LEDMode = */fingerprint.eBreathing, /*LEDColor = */fingerprint.eLEDBlue, /*blinkCount = */0);
-  Serial.println("请按下手指");
-    /*等待手指按下
-      检测到手指返回1，否则返回0
-     */
+  Serial.println("Please release your finger");
+  /*Wait for finger to release
+    Return 1 when finger is detected, otherwise return 0 
+   */
   while(!fingerprint.detectFinger());
-  #ifdef  QUARTER
-   //采集图像,这是1/4大小图像
+  #ifdef  QUARTER   //采集四分之一大小图像
   fingerprint.getQuarterFingerImage(data);
-  #else
-  //采集全图像
+  #else  //采集全尺寸图像
   fingerprint.getFingerImage(data);
   #endif
-  if (!SD.begin(/*csPin = */3, /*type = */TYPE_NONBOARD_SD_MOUDLE)) {
-    SerialUSB.println("initialization failed!");
-    while(1);
-  }
   myFile = SD.open("finger.bmp", FILE_WRITE);
   #ifdef  QUARTER
-  //将图片保存为bmp格式的文件到SD卡
   myFile.write((const char *)bmpHeader, sizeof(bmpHeader));
   for(uint8_t i = 0;i < 13 ;i++){
     if(i == 12){
@@ -115,6 +107,7 @@ void loop(){
   
    }
   #else
+  //将图片保存为bmp格式的文件到SD卡
   bmpHeader[18] = 0xa0;
   bmpHeader[22] = 0xa0;
   myFile.write((const char *)bmpHeader, sizeof(bmpHeader));
@@ -129,8 +122,5 @@ void loop(){
      screen.drawPixel(40+a,80+b,(data[i]/4)<<5);
    }
   #endif
-   
-  
-
   while(1);
 }
