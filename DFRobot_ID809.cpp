@@ -603,8 +603,6 @@ uint8_t DFRobot_ID809::delFingerprint(uint8_t ID)
   pCmdPacketHeader_t header = pack(CMD_TYPE, CMD_DEL_CHAR, data, 4);
   sendPacket(header);
   free(header);
-  if(ISIIC == true)
-  delay(360);
   uint8_t ret = responsePayload(buf);
   LDBG("ret=");
   LDBG(ret);
