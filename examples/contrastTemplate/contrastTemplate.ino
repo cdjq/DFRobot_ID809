@@ -11,8 +11,8 @@
 */
 #include <DFRobot_ID809.h>
 
-//模板数据
-uint8_t temp[1008]={0};
+
+uint8_t temp[1008]={0};    //模板数据
 
 /*Use software serial when using UNO or NANO*/
 #if ((defined ARDUINO_AVR_UNO) || (defined ARDUINO_AVR_NANO))
@@ -44,41 +44,41 @@ void setup(){
     //Serial.println(desc);
     delay(1000);
   }
-  //获取ID 1的指纹模板
+  //获取ID 1的指纹模板数据
   fingerprint.getTemplate(/*id = */1,temp);
   //将模板数据下载到ID 1中
   //fingerprint.downLoadTemplate(/*id = */1,temp);
 }
 
 void loop(){
-  //设置采集灯环
+  /*设置指纹LED环为蓝色呼吸灯*/
   fingerprint.ctrlLED(/*LEDMode = */fingerprint.eBreathing, /*LEDColor = */fingerprint.eLEDBlue, /*blinkCount = */0);
-  Serial.println("请按下手指");
-  /*采集指纹图像，关闭采集超时功能
-    如果获取成功返回0，否则返回ERR_ID809
-     采集一次指纹模板数据,然后储存到rambuffer0
+  Serial.println("Please press down your finger");
+  /*Capture fingerprint image, Disable the collection timeout function 
+    If succeed return 0, otherwise return ERR_ID809
+    采集指纹模板数据,并储存到rambuffer0
    */
   if((fingerprint.collectionFingerprint(/*timeout=*/0,0)) != ERR_ID809){
-    /*设置指纹灯环为黄色快闪3次*/
+    /*Set fingerprint LED ring to quick blink in yellow 3 times*/
     fingerprint.ctrlLED(/*LEDMode = */fingerprint.eFastBlink, /*LEDColor = */fingerprint.eLEDYellow, /*blinkCount = */3);
-    Serial.println("采集成功");
-    Serial.println("请松开手指");
-    /*等待手指松开
-      检测到手指返回1，否则返回0
+    Serial.println("Capturing succeeds");
+    Serial.println("Please release your finger");
+    /*Wait for finger to release
+      Return 1 when finger is detected, otherwise return 0 
      */
     while(fingerprint.detectFinger());
     //将模板数据与采集的指纹做对比
     if(!fingerprint.contrastTemplate(/*TEMP = */temp)){
-      /*设置指纹灯环为绿色常亮*/
+      /*Set fingerprint LED ring to always ON in green*/
       fingerprint.ctrlLED(/*LEDMode = */fingerprint.eKeepsOn, /*LEDColor = */fingerprint.eLEDGreen, /*blinkCount = */0);
-      Serial.println("对比成功,模板与手指匹配");
+      Serial.println("Matching succeeds,模板与手指匹配");
     }else{
-      /*设置指纹灯环为红色常亮*/
+      /*Set fingerprint LED ring to always ON in red*/
       fingerprint.ctrlLED(/*LEDMode = */fingerprint.eKeepsOn, /*LEDColor = */fingerprint.eLEDRed, /*blinkCount = */0);
-      Serial.println("对比失败,模板手指不匹配");
+      Serial.println("Matching fails,模板手指不匹配");
     }
   }else{
-    Serial.println("采集失败");
+    Serial.println("Capturing fails");
   }
   Serial.println("-----------------------------");
   delay(1000);
