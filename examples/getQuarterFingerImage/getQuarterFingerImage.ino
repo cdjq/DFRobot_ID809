@@ -76,7 +76,7 @@ void setup(){
 }
 
 void loop(){
-  /*Set the footprint LED ring as blue breathing light*/
+  /*Set the fingerprint module LED ring to blue breathing lighting effect*/
   fingerprint.ctrlLED(/*LEDMode = */fingerprint.eBreathing, /*LEDColor = */fingerprint.eLEDBlue, /*blinkCount = */0);
   Serial.println("Please release your finger");
   /*Wait for finger to release
