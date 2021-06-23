@@ -1,7 +1,7 @@
 /*!
  *@file getQuarterFingerImage.ino
- *@brief 将采集到的指纹图像储存与SD卡中,并显示在屏幕上,可选择获取1/4图像或者全图像
- *该示例需要搭配屏幕和SD卡模块使用，并且使用高性能主控
+ *@brief Store the collected fingerprint image in the SD card and display it on the screen, can select to obtain quarter image or full image
+ *This example needs to be used with screen, SD card，and high-performance main controllers. 
  *@copyright   Copyright (c) 2010 DFRobot Co.Ltd (http://www.dfrobot.com)
  *@licence     The MIT License (MIT)
  *@author [fengli](li.feng@dfrobot.com)
@@ -33,7 +33,7 @@
 #endif
 
 
-/*请根据使用的主控选择串口*/
+/*Choose the serial port according to the main controller you use*/
 #define FPSerial Serial1
 
 DFRobot_ILI9341_240x320_HW_SPI  screen(/*dc=*/TFT_DC,/*cs=*/TFT_CS,/*rst=*/TFT_RST);
@@ -43,9 +43,9 @@ File myFile;
 
 #define QUARTER
 #ifdef  QUARTER
-uint8_t data[6400];   //四分之一图像
+uint8_t data[6400];   //Quarter image
 #else
-uint8_t data[25600];  //全尺寸图像
+uint8_t data[25600];  //Full image
 #endif
 
 void setup(){
@@ -68,7 +68,7 @@ void setup(){
     //Serial.println(desc);
     delay(1000);
   }
-  /*请根据主控对于的SD库初始化SD卡模块*/
+  /*Initialize the SD card module according to SD library corresponding to the main controller*/
   while(!SD.begin(/*csPin = */3, /*type = */TYPE_NONBOARD_SD_MOUDLE)) {
     SerialUSB.println("initialization failed!");
     delay(1000);
@@ -76,16 +76,16 @@ void setup(){
 }
 
 void loop(){
-  /*设置指纹LED环为蓝色呼吸灯*/
+  /*Set the footprint LED ring as blue breathing light*/
   fingerprint.ctrlLED(/*LEDMode = */fingerprint.eBreathing, /*LEDColor = */fingerprint.eLEDBlue, /*blinkCount = */0);
   Serial.println("Please release your finger");
   /*Wait for finger to release
     Return 1 when finger is detected, otherwise return 0 
    */
   while(!fingerprint.detectFinger());
-  #ifdef  QUARTER   //采集四分之一大小图像
+  #ifdef  QUARTER   //Collect quarter images
   fingerprint.getQuarterFingerImage(data);
-  #else  //采集全尺寸图像
+  #else  //Collect full images
   fingerprint.getFingerImage(data);
   #endif
   myFile = SD.open("finger.bmp", FILE_WRITE);
@@ -99,7 +99,7 @@ void loop(){
     myFile.write((const char *)data+i*512, 512);
     }
     myFile.close(); 
-   //将图片显示在屏幕上
+   //Display the image on the screen
    for(uint16_t i = 0; i < 6400 ;i++){
      uint8_t a = i % 80;
      uint8_t b = i / 80;
@@ -107,7 +107,7 @@ void loop(){
   
    }
   #else
-  //将图片保存为bmp格式的文件到SD卡
+  //Save the picture in bmp format to SD card
   bmpHeader[18] = 0xa0;
   bmpHeader[22] = 0xa0;
   myFile.write((const char *)bmpHeader, sizeof(bmpHeader));
@@ -115,7 +115,7 @@ void loop(){
     myFile.write((const char *)data+i*512, 512);
     }
   myFile.close(); 
-  //将图片显示在屏幕上
+  //Display the image on the screen
   for(uint16_t i = 0; i < 25600 ;i++){
      uint8_t a = i % 160;
      uint8_t b = i / 160;
