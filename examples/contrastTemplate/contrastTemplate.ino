@@ -34,6 +34,7 @@ void setup(){
   /*Take FPSerial as communication port of fingerprint module */
   fingerprint.begin(FPSerial);
   /*Wait for Serial to open*/
+  while(!Serial);
   /*Test whether device can communicate properly with mainboard 
     Return true or false
     */
